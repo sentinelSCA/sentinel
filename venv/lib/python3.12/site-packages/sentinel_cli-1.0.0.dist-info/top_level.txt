@@ -1,3 +1,0 @@
-sentinel_cli_pkg
-sentinel_core
-sentinel_rules
