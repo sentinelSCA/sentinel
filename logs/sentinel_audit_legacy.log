@@ -1,0 +1,15 @@
+2026-02-10T06:53:40.102740 | Command: ls | Decision: APPROVED | Risk: LOW
+2026-02-10T06:53:40.103856 | Command: sudo reboot | Decision: BLOCKED | Risk: HIGH
+2026-02-10T06:53:40.104202 | Command: rm -rf / | Decision: BLOCKED | Risk: HIGH
+2026-02-10T06:53:40.104290 | Command: echo hello | Decision: APPROVED | Risk: LOW
+2026-02-10T06:55:51.545157 | Command: exitcat logs/sentinel_audit.log | Decision: APPROVED | Risk: LOW
+2026-02-10T06:58:48.839819 | Command: cd ~/sentinel | Decision: APPROVED | Risk: LOW
+2026-02-10T06:58:50.653864 | Command: python3 sentinel_daemon.py | Decision: APPROVED | Risk: LOW
+2026-02-10T06:59:16.214291 | Command: cat logs/sentinel_audit.log | Decision: APPROVED | Risk: LOW
+2026-02-10T07:00:28.837993 | Command: nano sentinel_rules/basic_rules.py | Decision: APPROVED | Risk: LOW
+2026-02-10T11:37:38.595777+00:00 | CMD: cat logs/sentinel_audit.log | DECISION: APPROVED | RISK: LOW | VT: ecbec3a1fe2a7c66941be71093fe4a54695c0777d0a76ccb933fed20a085d4c8
+Decision: BLOCKED | Risk: HIGH
+{"timestamp": "2026-02-10T17:21:36.590403", "command": "echo hello", "decision": "APPROVED", "risk": "LOW", "reason": "No policy violations detected", "policy_version": "v1"}
+{"timestamp": "2026-02-10T17:21:36.591425", "command": "sudo apt update", "decision": "WARN", "risk": "MEDIUM", "reason": "Command contains elevated keyword: sudo", "policy_version": "v1"}
+{"timestamp": "2026-02-10T17:21:36.591771", "command": "rm -rf /", "decision": "BLOCKED", "risk": "CRITICAL", "reason": "Command matches high-risk pattern: rm -rf /", "policy_version": "v1"}
+{"timestamp": "2026-02-10T17:22:09.246752", "command": "exitexit", "decision": "APPROVED", "risk": "LOW", "reason": "No policy violations detected", "policy_version": "v1"}

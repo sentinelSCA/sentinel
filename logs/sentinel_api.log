@@ -1,0 +1,140 @@
+2026-02-12T23:22:45+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:30:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:31:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:34:57+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:34:58+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:38:17+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:38:18+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:40:35+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:40:36+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:40:37+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:48:59+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:49:00+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:50:30+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:07+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-12T23:54:08+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:01:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:01:25+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T07:30:28+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:30:28+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T07:35:50+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:35:51+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T07:36:36+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:36:36+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T07:37:48+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:37:48+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T07:37:58+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:37:59+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:38:00+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:38:01+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:20+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:21+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:22+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:23+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:25+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:26+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:27+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:28+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:39:29+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:41:21+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:41:22+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:41:23+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:41:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T07:41:25+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13 11:36:34,987Z INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13 11:36:35,100Z INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13 11:40:12,223Z INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-13 11:40:12,237Z INFO http_error client=127.0.0.1 agent_id=a status=409 detail=Replay detected
+2026-02-13T12:15:21+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T13:02:32+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T13:05:53+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T13:06:15+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=rm -f /
+2026-02-13T13:08:09+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=rm -f
+2026-02-13T13:12:21+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=rm -f /
+2026-02-13T13:34:33+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=rm -f /
+2026-02-13T13:38:04+0000 INFO analyze client=127.0.0.1 agent_id=a decision=allow risk=low score=0.05 cmd=rm -f /
+2026-02-13T14:51:02+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T14:51:02+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=allow risk=low score=0.05 cmd=rm -f /
+2026-02-13T14:51:02+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T15:00:34+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=deny risk=high score=0.95 cmd=rm -f /
+2026-02-13T15:00:34+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T15:00:34+0000 INFO analyze client=127.0.0.1 agent_id=guard:test decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T15:02:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -f /
+2026-02-13T15:02:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T15:02:24+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=allow risk=low score=0.05 cmd=ls
+2026-02-13T15:29:09+0000 INFO analyze client=127.0.0.1 agent_id=cli:local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-13T20:20:49+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-14T06:54:17+0000 INFO analyze client=127.0.0.1 agent_id=local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-16T12:09:38+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-16T12:11:41+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=ls
+2026-02-16T13:22:07+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-16T13:22:42+0000 INFO analyze client=127.0.0.1 agent_id=local decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-16T15:12:08+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=ls
+2026-02-16T15:43:59+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=ls
+2026-02-16T15:44:26+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=deny risk=high score=0.95 cmd=🔍rm -f /
+2026-02-16T16:58:36+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-16T18:29:26+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T07:49:00+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T07:53:51+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T07:56:09+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T15:25:36+0000 INFO analyze client=127.0.0.1 agent_id=local decision=deny risk=high score=0.95 cmd=rm -rf
+2026-02-17T16:46:26+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T16:47:18+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=allow risk=low score=0.05 cmd=rm rf
+2026-02-17T16:49:06+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=deny risk=high score=0.95 cmd=rm -rf /

@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: sentinel-cli
+Version: 1.0.0
+Summary: Sentinel local CLI client (signed requests)
+Requires-Python: >=3.10
+Requires-Dist: requests
+Requires-Dist: python-dotenv
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
