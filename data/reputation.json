@@ -1,0 +1,44 @@
+{
+  "agents": {
+    "a": {
+      "agent_id": "a",
+      "allowed": 3,
+      "blocked": 4,
+      "last_decision": "deny",
+      "reputation": -5,
+      "reviewed": 0,
+      "updated_at": 1770935328.5359201
+    },
+    "guard:test": {
+      "agent_id": "guard:test",
+      "allowed": 1,
+      "blocked": 1,
+      "last_decision": "deny",
+      "reputation": -1,
+      "reviewed": 0,
+      "updated_at": 1770927040.7114213
+    },
+    "tg:1408102631": {
+      "agent_id": "tg:1408102631",
+      "allowed": 2,
+      "blocked": 0,
+      "last_decision": "allow",
+      "reputation": 2,
+      "reviewed": 0,
+      "updated_at": 1770926372.0174837
+    },
+    "tg:846358790": {
+      "agent_id": "tg:846358790",
+      "allowed": 8,
+      "blocked": 4,
+      "last_decision": "deny",
+      "reputation": 0,
+      "reviewed": 0,
+      "updated_at": 1770926756.1733196
+    }
+  },
+  "meta": {
+    "created_at": 1770886486.0868516,
+    "version": 1
+  }
+}

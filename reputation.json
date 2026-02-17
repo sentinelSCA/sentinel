@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "version": 1
+  },
+  "agents": {
+    "cli:local": {
+      "agent_id": "cli:local",
+      "allowed": 0,
+      "blocked": 1,
+      "last_decision": "deny",
+      "reputation": -2,
+      "reviewed": 0,
+      "updated_at": 1770996549.9667487
+    },
+    "local": {
+      "agent_id": "local",
+      "allowed": 10,
+      "blocked": 3,
+      "last_decision": "deny",
+      "reputation": -2,
+      "reviewed": 0,
+      "updated_at": 1771341936.239481
+    },
+    "telegram": {
+      "agent_id": "telegram",
+      "allowed": 2,
+      "blocked": 1,
+      "last_decision": "deny",
+      "reputation": 0,
+      "reviewed": 0,
+      "updated_at": 1771346946.5530152
+    },
+    "tg:846358790": {
+      "agent_id": "tg:846358790",
+      "allowed": 2,
+      "blocked": 1,
+      "last_decision": "deny",
+      "reputation": 0,
+      "reviewed": 0,
+      "updated_at": 1771256666.7699594
+    }
+  }
+}
