@@ -1,0 +1,8 @@
+Subject: Introducing Sentinel Audit Layer
+
+Hi partner@example.com,
+
+(professional) Email about: How our audit chain hashing ensures tamper-proof compliance
+
+Generated at: 2026-02-18T14:28:57.542778
+Agent: Email

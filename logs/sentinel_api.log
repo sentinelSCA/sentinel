@@ -138,3 +138,34 @@
 2026-02-17T16:46:26+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=allow risk=low score=0.05 cmd=echo hello
 2026-02-17T16:47:18+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=allow risk=low score=0.05 cmd=rm rf
 2026-02-17T16:49:06+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-17T18:33:26+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T18:52:53+0000 INFO analyze client=127.0.0.1 agent_id=local decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T19:22:49+0000 INFO analyze client=127.0.0.1 agent_id=local decision=review risk=medium score=0.65 cmd=rm file.txt
+2026-02-17T21:31:33+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-17T21:31:43+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=ls
+2026-02-17T21:31:56+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=deny risk=high score=0.95 cmd=rm -rf
+2026-02-17T21:32:09+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-17T23:57:41+0000 INFO analyze client=127.0.0.1 agent_id=telegram decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-18T06:04:02+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=ls
+2026-02-18T06:42:56+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=Hi
+2026-02-18T08:48:35+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-18T08:48:39+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=Yes
+2026-02-18T08:56:45+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=echo hello
+2026-02-18T08:56:51+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=allow risk=low score=0.05 cmd=Yes
+2026-02-18T10:50:14+0000 INFO analyze client=127.0.0.1 agent_id=tg:846358790 decision=deny risk=high score=0.95 cmd=rm -rf /
+2026-02-18T13:50:34+0000 INFO analyze client=127.0.0.1 agent_id=worker:manager decision=allow risk=low score=0.05 cmd=generate content about AI supply chain security risks in 2026
+2026-02-18T14:28:57+0000 INFO analyze client=127.0.0.1 agent_id=worker:email decision=allow risk=low score=0.05 cmd=write email subject Introducing Sentinel Audit Layer
+2026-02-18T14:28:59+0000 INFO analyze client=127.0.0.1 agent_id=worker:email decision=allow risk=low score=0.05 cmd=write email subject Sentinel Growth Update
+2026-02-18T15:05:32+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Why secure agent infrastructure matters
+2026-02-18T15:06:58+0000 INFO analyze client=127.0.0.1 agent_id=worker:twitter decision=allow risk=low score=0.05 cmd=write tweet about SCA now runs multi-agent system
+2026-02-18T15:07:20+0000 INFO analyze client=127.0.0.1 agent_id=worker:twitter decision=allow risk=low score=0.05 cmd=write tweet about SCA now runs multi-agent system
+2026-02-18T15:07:43+0000 INFO analyze client=127.0.0.1 agent_id=worker:manager decision=allow risk=low score=0.05 cmd=generate content about Build a secure agent marketplace infrastructure
+2026-02-18T15:39:32+0000 INFO analyze client=127.0.0.1 agent_id=worker:email decision=allow risk=low score=0.05 cmd=write email subject None
+2026-02-18T18:35:08+0000 INFO analyze client=127.0.0.1 agent_id=worker:twitter decision=allow risk=low score=0.05 cmd=write tweet about SCA now runs a secure multi-agent system
+2026-02-18T18:53:24+0000 INFO analyze client=127.0.0.1 agent_id=worker:twitter decision=allow risk=low score=0.05 cmd=write tweet about Sentinel SCA agents are live: signed requests + audit chain + sandbox execution.
+2026-02-19T07:31:23+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Write a short update about Sentinel SCA progress this week
+2026-02-19T07:38:55+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Weekly infrastructure update
+2026-02-19T07:45:54+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Weekly infrastructure update for Sentinel SCA (audit chain, signed requests, dockerized services)
+2026-02-19T08:40:48+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Write a tweet-style update about Sentinel SCA progress this week
+2026-02-19T10:01:31+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Weekly Sentinel SCA update mentioning signed requests, audit chain, docker deployment, and telegram alerts
+2026-02-19T10:05:53+0000 INFO analyze client=127.0.0.1 agent_id=worker:writer decision=allow risk=low score=0.05 cmd=write content about Write a weekly update ONLY about Sentinel SCA features listed in README: signed requests, deterministic policy decisions, audit-chain hashing/integrity, sandbox isolation, reputati

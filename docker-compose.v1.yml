@@ -1,0 +1,115 @@
+name: sentinel
+
+services:
+  redis:
+    image: redis:7
+    container_name: sentinel-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+  sentinel-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: sentinel-api
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "8001:8001"
+
+  manager-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "worker_manager.py"]
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  approver-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "approver_bot.py"]
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  executor-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "executor_worker.py"]
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  probe-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "worker_probe.py"]
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - sentinel-api
+
+  reaper-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "reaper_worker.py"]
+    env_file: [.env]
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  # Optional UI tools (not part of v1 core)
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: sentinel-dozzle
+    restart: unless-stopped
+    ports:
+      - "9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOZZLE_TAILSIZE=300
+      - DOZZLE_LEVEL=info
+    profiles: ["ui"]
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: sentinel-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    profiles: ["ui"]
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: sentinel-redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+    profiles: ["ui"]
+
+volumes:
+  redis_data:
+  portainer_data:
+  redisinsight_data:

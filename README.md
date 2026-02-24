@@ -1,186 +1,241 @@
-<p align="center">
-  <img src="logo.png" width="220" alt="SCA Sentinel Compliance Agent logo">
-</p>
+# Sentinel SCA
 
-# SCA — Sentinel Compliance Agent
+Sentinel SCA is a Deterministic Enforcement Layer for Autonomous Agents.
 
-**Signed-command security gateway for AI agents and automation systems.**
+It acts as a cryptographic policy gateway between AI agents and execution environments.
 
-SCA evaluates, signs, and enforces policies on commands **before execution**, preventing unsafe or malicious actions.
+Its purpose is simple:
 
-Built on the **Sentinel Security Engine**.
+Autonomous systems must not execute without enforceable, auditable, deterministic control.
 
 ---
 
-## 🔐 Core Capabilities
+# The Problem
 
-- HMAC-SHA256 request signing
-- Replay protection (nonce + timestamp)
-- Per-agent rate limiting
-- Agent reputation scoring
-- Deterministic policy enforcement
-- Signed CLI client
-- Optional Telegram bot integration
-- Structured logging
-- Zero-trust execution model
+AI agents are increasingly capable of:
 
----
+- Executing shell commands
+- Managing infrastructure
+- Sending emails
+- Posting to social platforms
+- Interacting with external APIs
+- Orchestrating other agents
 
-## 🚀 Quick Start
+Most systems today rely on:
 
-### 1️⃣ Install
+- Prompt engineering
+- Soft guardrails
+- Basic API keys
+- Application-level checks
 
-```bash
-git clone https://github.com/yourname/sca-sentinel.git
-cd sca-sentinel
+These are not enforcement mechanisms.
 
-python -m venv venv
-./venv/bin/pip install -e .
-```
+They are suggestions.
 
----
+Once agents gain execution capability, the absence of deterministic enforcement becomes a systemic risk.
 
-### 2️⃣ Start API Server
-
-```bash
-./venv/bin/uvicorn sentinel_api:app --host 127.0.0.1 --port 8000
-```
-
-Server runs locally at:
-
-```
-http://127.0.0.1:8000
-```
+Sentinel exists to solve that.
 
 ---
 
-### 3️⃣ Run CLI
+# Core Principle
 
-Allow example:
+LLMs generate.
+Sentinel enforces.
 
-```bash
-./venv/bin/sentinel "ls"
-```
+Policy must be:
 
-Blocked example:
+- Deterministic
+- Cryptographically verifiable
+- Auditable
+- Replay-resistant
+- Tamper-evident
 
-```bash
-./venv/bin/sentinel "rm -rf /"
-```
-
----
-
-### 4️⃣ (Optional) Telegram Bot
-
-```bash
-./venv/bin/python sentinel_telegram.py
-```
-
-Use Telegram as a remote signed command interface.
+Security cannot depend on model behavior.
 
 ---
 
-## 🧪 Direct API Testing
+# Core Architecture
 
-```bash
-tools/test_request.sh ls a
-tools/test_request.sh "rm -rf /" a
-```
+Sentinel SCA consists of:
 
----
-
-## 📤 Exit Codes
-
-| Code | Meaning |
-|--------|-----------|
-| 0 | Allow |
-| 2 | Deny |
-| 3 | Review / Warning |
-| 1 | Client or runtime error |
+1. API Gateway (FastAPI)
+2. HMAC request signing
+3. Ed25519 agent identity
+4. Deterministic policy engine
+5. Audit-chain hashing (WORM-style integrity)
+6. Resource-limited sandbox execution
+7. Reputation engine
+8. Rate limiting engine
+9. Multi-agent orchestration system
 
 ---
 
-## ⚠️ Common Errors
+# Enforcement Flow
 
-| Code | Cause |
-|--------|------------------------------|
-| 401 | Missing or invalid signature |
-| 409 | Replay detected |
-| 429 | Rate limit exceeded |
+Agent → Signed Request → Sentinel → Policy Engine → Execution Sandbox → Audit Chain → Reputation Update
+
+Step-by-step:
+
+1. Agent signs request (HMAC + optional Ed25519)
+2. Sentinel validates:
+   - API key
+   - Timestamp window
+   - Signature integrity
+   - Nonce replay protection
+3. Deterministic policy evaluation
+4. If allowed:
+   - Command executed inside sandbox
+   - Execution recorded
+   - Audit chain updated
+   - Reputation adjusted
+5. If denied:
+   - Decision logged
+   - Audit chain updated
+
+Every decision is traceable.
 
 ---
 
-## 🛡 Security Model
+# Threat Model
 
-Sentinel follows a **defense-in-depth architecture**:
+Sentinel is designed to mitigate:
 
-- Constant-time signature verification (`compare_digest`)
-- Canonical JSON signing (sorted keys, compact separators)
-- Timestamp validation window
+- Prompt injection
+- Replay attacks
+- Agent impersonation
+- Command escalation
+- Audit tampering
+- Resource exhaustion
+- Autonomous abuse loops
+- Signature forgery
+- Timestamp manipulation
+
+Sentinel assumes agents can be compromised.
+Enforcement must not rely on trust.
+
+---
+
+# Security Model
+
+Sentinel enforces:
+
+- API key validation
+- HMAC request signature verification
+- Optional Ed25519 agent identity
+- Timestamp window protection
 - Nonce replay prevention
-- Per-agent quotas
-- Reputation scoring
-- Policy-based deny rules
-- Structured audit logs
-
-### Enforcement Flow
-
-```
-signed → verified → rate-checked → reputation-checked → policy-checked → executed
-```
-
-Nothing bypasses Sentinel.
+- Immutable audit chain
+- Resource-limited sandbox execution
+- Command allowlist filtering
+- Deterministic policy evaluation
 
 ---
 
-## ⚙ Environment Variables
+# Audit Chain
 
-```bash
-SENTINEL_API_KEY=sentinel-local-111111
-SENTINEL_SIGNING_SECRET=change-me
-SENTINEL_RATE_LIMIT_MAX=30
-SENTINEL_RATE_LIMIT_WINDOW_SEC=60
-```
+Each request produces:
 
----
+Hash = SHA256(prev_hash + entry_json)
 
-## 📂 Project Structure
+Optional HMAC signature of entry hash.
 
-```
-sentinel_api.py         FastAPI server
-sentinel_cli_pkg/       Signed CLI client package
-sentinel_guard.py       Core evaluation logic
-sentinel_telegram.py    Telegram bot integration
-tools/                  Test utilities
-logs/                   Runtime logs
-docs/                   Architecture & roadmap
-```
+This creates tamper detection across the entire request history.
+
+Audit head is available via:
+
+GET /audit/head
+
+The audit chain is append-only.
 
 ---
 
-## 🎯 Use Cases
+# Reputation Engine
 
-- AI agent command gating
-- Secure automation systems
-- CLI protection
-- Telegram remote execution with trust
-- Zero-trust command approval
-- Local or self-hosted security gateway
+Each agent accumulates behavioral reputation.
+
+Policy can incorporate:
+
+- Rate violations
+- Denied actions
+- Escalation attempts
+- Signature anomalies
+- Execution failures
+
+Reputation becomes a programmable enforcement primitive.
 
 ---
 
-## 📜 License
+# Multi-Agent System
 
-Internal / Experimental
+Sentinel supports structured multi-agent workflows:
+
+- Manager Agent (incident classification & decision logic)
+- Maintenance Agent (infrastructure monitoring)
+- Approver Agent (policy approval gate)
+- Executor Agent (sandboxed execution)
+- Writer Agent (LLM content generation)
+- Verifier Agent (content grounding validation)
+- Publish Agents (Twitter / Email)
+
+All execution passes through Sentinel.
+
+No direct execution is trusted.
 
 ---
 
-## 🧠 Philosophy
+# Deterministic vs LLM Guardrails
 
-Security first.  
-Trust nothing.  
-Verify everything.
+LLM guardrails are probabilistic.
 
-All commands must be signed and validated.
+Sentinel enforcement is deterministic.
 
-Sentinel is the gatekeeper.
+LLMs may recommend.
+Sentinel decides.
+
+This separation is intentional.
+
+---
+
+# Roadmap
+
+Phase 1:
+- Secure command gateway
+- Signed API
+- Audit chain
+- Telegram interface
+
+Phase 2:
+- Multi-agent orchestration
+- Local LLM integration (Ollama)
+- Content verification system
+
+Phase 3:
+- Agent marketplace integration
+- MCP compatibility
+- gRPC fleet communication
+- WebSocket audit streaming
+
+Phase 4:
+- Distributed enforcement nodes
+- Delegation model
+- Validator economy
+- Cross-agent reputation scoring
+
+---
+
+# Vision
+
+Sentinel is not just SCA.
+
+It is an enforcement protocol for the autonomous internet.
+
+As AI agents become infrastructure actors, they require:
+
+- Deterministic control
+- Cryptographic identity
+- Auditable decision systems
+- Resource-bound execution
+- Reputation-based trust
+
+Sentinel aims to become the enforcement layer between autonomy and execution.

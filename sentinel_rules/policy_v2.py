@@ -64,5 +64,11 @@ def evaluate_command_v2(command: str, reputation: int) -> Tuple[str, str, float,
         if rx.search(cmd):
             return ("deny", "high", 0.95, reason)
 
-    # 3) Default allow
+    # 3) Require approval keywords (soft gate)
+    if REQUIRE_APPROVAL:
+        tokens = re.findall(r"[a-z0-9_./-]+", cmd.lower())
+        if any(k in tokens for k in REQUIRE_APPROVAL):
+            return ("review", "medium", 0.65, f"Requires approval: {', '.join(REQUIRE_APPROVAL)}")
+
+    # 4) Default allow
     return ("allow", "low", 0.05, "No policy violations detected")

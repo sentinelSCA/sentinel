@@ -1,0 +1,9 @@
+{
+  "agent_id": "worker:verifier",
+  "timestamp": "2026-02-19T14:03:59.478704+00:00",
+  "source_path": "outputs_writer/e3b4a64a-376a-4e80-b534-151ddcc15237.txt",
+  "verdict": {
+    "decision": "approve",
+    "reason": "Looks grounded in README."
+  }
+}

@@ -1,0 +1,8 @@
+Subject: Sentinel Growth Update
+
+Hi investor@example.com,
+
+(confident) Email about: Progress on Docker, sandbox hardening, and agent automation
+
+Generated at: 2026-02-18T14:28:59.564933
+Agent: Email

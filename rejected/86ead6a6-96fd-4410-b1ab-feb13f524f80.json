@@ -1,0 +1,9 @@
+{
+  "agent_id": "worker:verifier",
+  "timestamp": "2026-02-19T09:57:43.283729+00:00",
+  "source_path": "outputs_writer/23d235b1-2a5e-40d2-83b7-90ee90ee8291.txt",
+  "verdict": {
+    "decision": "reject",
+    "reason": "Not grounded enough in README context."
+  }
+}
