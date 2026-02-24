@@ -14,10 +14,12 @@ pydantic_core==2.41.5
 python-dotenv==1.2.1
 python-telegram-bot==22.6
 requests==2.32.5
-# Editable install with no version control (sentinel-cli==1.0.0)
--e /home/sentinel/sentinel
 starlette==0.52.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.6.3
 uvicorn==0.40.0
+redis==5.0.1
+cryptography==42.0.8
+requests-oauthlib
+requests

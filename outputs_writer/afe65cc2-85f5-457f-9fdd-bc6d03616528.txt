@@ -1,0 +1,6 @@
+[PROFESSIONAL CONTENT]
+
+Topic: Write a short update about Sentinel SCA progress this week
+
+Generated at: (datetime.utcnow).isoformat()
+Agent: Writer

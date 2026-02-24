@@ -1,0 +1,2 @@
+Professional take: Sentinel SCA agents are live: signed requests + audit chain + sandbox execution. #SCA
+2026-02-18T18:53:24.018873+00:00

@@ -1,0 +1,20 @@
+sentinel-bot:
+    build: .
+    command: ["python", "-u", "telegram_bot/bot.py"]
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+
+      # ✅ force internal docker DNS/service name (NOT 127.0.0.1)
+      SENTINEL_URL: "http://sentinel-api:8001/analyze"
+      SENTINEL_API_URL: "http://sentinel-api:8001/analyze"
+      API_BASE_URL: "http://sentinel-api:8001"
+
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      sentinel-api:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped

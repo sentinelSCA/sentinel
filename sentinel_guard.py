@@ -54,10 +54,12 @@ def _sign_payload(payload: dict) -> str:
     return hmac.new(SIGNING_SECRET.encode(), msg, hashlib.sha256).hexdigest()
 
 def call_api(command: str, agent_id: str) -> Dict[str, Any]:
+    ts_unix = str(int(time.time()))
+
     payload_body = {
         "agent_id": agent_id,
         "command": command,
-        "timestamp": "123",
+        "timestamp": ts_unix,
     }
 
     headers = {"Content-Type": "application/json"}
@@ -66,7 +68,6 @@ def call_api(command: str, agent_id: str) -> Dict[str, Any]:
 
     # If signing is enabled on the server, include signature headers
     if SIGNING_SECRET:
-        ts_unix = str(int(time.time()))
         signed_payload = {
             "agent_id": agent_id,
             "command": command,

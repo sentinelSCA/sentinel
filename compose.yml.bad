@@ -1,0 +1,39 @@
+cd ~/sentinel
+cp compose.yml compose.yml.bak
+
+cat > compose.yml <<'YAML'
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  sentinel-api:
+    build: .
+    command: uvicorn sentinel_api:app --host 0.0.0.0 --port 8001
+    env_file: .env
+    depends_on:
+      - redis
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  sentinel-bot:
+    build: .
+    command: python telegram_bot.py
+    env_file: .env
+    depends_on:
+      - sentinel-api
+      - redis
+    restart: unless-stopped
+
+  maintenance-worker:
+    build: .
+    command: python maintenance_worker.py
+    env_file: .env
+    depends_on:
+      - sentinel-api
+      - redis
+    restart: unless-stopped
+YAML
