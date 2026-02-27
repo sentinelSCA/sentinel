@@ -151,3 +151,74 @@ Sentinel Validator Shield™ deployment:
 # 🚀 Quick Start (Docker)
 
 ## 1️⃣ Clone
+
+
+💼 Sentinel Validator Edition
+
+Sentinel Validator Edition is a hardened deployment of Sentinel SCA for Web3 validator operators.
+
+It enforces deterministic execution control on validator automation.
+
+What It Protects Against
+	•	Bad remediation scripts
+	•	Escalation loops
+	•	Replay attacks
+	•	Unauthorized restarts
+	•	Automation abuse
+	•	Human error during incidents
+
+⸻
+
+🔒 Validator Hard Lock Policy
+
+Validator Edition enforces:
+	•	✅ restart_service → sentinel-api → ALLOW
+	•	⚠ restart_service → other services → REVIEW
+	•	❌ Shell execution → DENY
+	•	❌ Arbitrary command execution → DENY
+
+All actions are:
+	•	Signed
+	•	Timestamp-validated
+	•	Replay-protected
+	•	Audit-chained
+	•	Reputation-adjusted
+
+⸻
+
+💰 Pricing
+
+Starter — $49/month per validator
+	•	Sentinel deployment
+	•	Validator hard-lock policy
+	•	Dashboard access
+	•	Audit chain
+	•	Telegram/email alerts
+	•	Guided onboarding
+
+Pro — $149/month
+	•	Up to 5 validators
+	•	Custom policy tuning
+	•	Incident classification support
+	•	Priority assistance
+
+Enterprise: Custom
+
+⸻
+
+🚫 Token Policy
+
+Sentinel Validator Edition has no token.
+
+It is security infrastructure.
+
+If a token ever exists, it will be separate from the Validator Edition product.
+
+⸻
+
+🧭 Onboarding
+
+If you operate a validator and want deterministic automation enforcement:
+
+Email: sentinel.labs.ai@gmail.com
+Or open an issue labeled: validator-onboarding
