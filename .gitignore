@@ -1,7 +1,31 @@
-venv/
+# Secrets / env
+.env
+.env.*
+*.env
+*.bak
+.env.bak*
+.env.backup
+
+# Python
 __pycache__/
 *.pyc
-.env
-logs/
-*.db
-reputation.json
+.venv/
+venv/
+
+# Local outputs
+published_twitter/
+outputs_twitter/
+published_email/
+outputs_email/
+
+# Local ops / backups
+_backup/
+LOCKDOWN_VPS_PROD_2026.md
+dashboard_patch.py
+
+# Compose local variants
+docker-compose.override.yml
+docker-compose.*.yml
+*.yml.bak*
+docker-compose.override.yml.disabled
+docker-compose.v1.yml.disabled

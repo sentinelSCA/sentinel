@@ -1,241 +1,153 @@
-# Sentinel SCA
+# 🔒 Sentinel SCA
 
-Sentinel SCA is a Deterministic Enforcement Layer for Autonomous Agents.
+## Deterministic Execution Authorization for Autonomous Systems
 
-It acts as a cryptographic policy gateway between AI agents and execution environments.
+Sentinel SCA is a deterministic enforcement gateway that ensures autonomous systems prove they are authorized to execute **before execution happens**.
 
-Its purpose is simple:
+It introduces a missing primitive in modern automation:
 
-Autonomous systems must not execute without enforceable, auditable, deterministic control.
+> Execution must be cryptographically validated and policy-enforced before it is allowed to occur.
+
+Sentinel acts as a control layer between AI agents, automation systems, bots, and real-world execution environments.
 
 ---
 
-# The Problem
+# 🚨 The Core Problem
 
-AI agents are increasingly capable of:
+Autonomous systems today can:
 
-- Executing shell commands
-- Managing infrastructure
-- Sending emails
-- Posting to social platforms
-- Interacting with external APIs
-- Orchestrating other agents
+- Execute shell commands
+- Manage infrastructure
+- Restart services
+- Send emails
+- Post to social platforms
+- Trigger CI/CD pipelines
+- Orchestrate other agents
 
-Most systems today rely on:
-
-- Prompt engineering
-- Soft guardrails
+Most systems rely on:
+- Prompt guardrails
 - Basic API keys
 - Application-level checks
+- Trust in the agent
 
 These are not enforcement mechanisms.
 
 They are suggestions.
 
-Once agents gain execution capability, the absence of deterministic enforcement becomes a systemic risk.
+Once execution capability exists, lack of deterministic authorization becomes systemic risk.
 
-Sentinel exists to solve that.
-
----
-
-# Core Principle
-
-LLMs generate.
-Sentinel enforces.
-
-Policy must be:
-
-- Deterministic
-- Cryptographically verifiable
-- Auditable
-- Replay-resistant
-- Tamper-evident
-
-Security cannot depend on model behavior.
+Sentinel solves this.
 
 ---
 
-# Core Architecture
-
-Sentinel SCA consists of:
-
-1. API Gateway (FastAPI)
-2. HMAC request signing
-3. Ed25519 agent identity
-4. Deterministic policy engine
-5. Audit-chain hashing (WORM-style integrity)
-6. Resource-limited sandbox execution
-7. Reputation engine
-8. Rate limiting engine
-9. Multi-agent orchestration system
-
----
-
-# Enforcement Flow
-
-Agent → Signed Request → Sentinel → Policy Engine → Execution Sandbox → Audit Chain → Reputation Update
-
-Step-by-step:
-
-1. Agent signs request (HMAC + optional Ed25519)
-2. Sentinel validates:
-   - API key
-   - Timestamp window
-   - Signature integrity
-   - Nonce replay protection
-3. Deterministic policy evaluation
-4. If allowed:
-   - Command executed inside sandbox
-   - Execution recorded
-   - Audit chain updated
-   - Reputation adjusted
-5. If denied:
-   - Decision logged
-   - Audit chain updated
-
-Every decision is traceable.
-
----
-
-# Threat Model
-
-Sentinel is designed to mitigate:
-
-- Prompt injection
-- Replay attacks
-- Agent impersonation
-- Command escalation
-- Audit tampering
-- Resource exhaustion
-- Autonomous abuse loops
-- Signature forgery
-- Timestamp manipulation
-
-Sentinel assumes agents can be compromised.
-Enforcement must not rely on trust.
-
----
-
-# Security Model
+# 🧠 What Sentinel Does
 
 Sentinel enforces:
 
-- API key validation
-- HMAC request signature verification
-- Optional Ed25519 agent identity
-- Timestamp window protection
-- Nonce replay prevention
-- Immutable audit chain
-- Resource-limited sandbox execution
-- Command allowlist filtering
+- HMAC request signing
+- Timestamp validation
+- Nonce replay protection
 - Deterministic policy evaluation
+- Command allowlisting
+- Resource-limited sandbox execution
+- Append-only audit chain hashing
+- Reputation-based enforcement
+- Multi-agent execution gating
 
----
+LLMs generate.
 
-# Audit Chain
-
-Each request produces:
-
-Hash = SHA256(prev_hash + entry_json)
-
-Optional HMAC signature of entry hash.
-
-This creates tamper detection across the entire request history.
-
-Audit head is available via:
-
-GET /audit/head
-
-The audit chain is append-only.
-
----
-
-# Reputation Engine
-
-Each agent accumulates behavioral reputation.
-
-Policy can incorporate:
-
-- Rate violations
-- Denied actions
-- Escalation attempts
-- Signature anomalies
-- Execution failures
-
-Reputation becomes a programmable enforcement primitive.
-
----
-
-# Multi-Agent System
-
-Sentinel supports structured multi-agent workflows:
-
-- Manager Agent (incident classification & decision logic)
-- Maintenance Agent (infrastructure monitoring)
-- Approver Agent (policy approval gate)
-- Executor Agent (sandboxed execution)
-- Writer Agent (LLM content generation)
-- Verifier Agent (content grounding validation)
-- Publish Agents (Twitter / Email)
-
-All execution passes through Sentinel.
+Sentinel decides.
 
 No direct execution is trusted.
 
 ---
 
-# Deterministic vs LLM Guardrails
+# ⚙️ Enforcement Flow
 
-LLM guardrails are probabilistic.
+Agent  
+→ Signed Request  
+→ Sentinel Gateway  
+→ Deterministic Policy Engine  
+→ Sandboxed Execution  
+→ Audit Chain Update  
+→ Reputation Update  
 
-Sentinel enforcement is deterministic.
+Every action is:
 
-LLMs may recommend.
-Sentinel decides.
-
-This separation is intentional.
+- Signed
+- Validated
+- Logged
+- Replay-resistant
+- Tamper-evident
 
 ---
 
-# Roadmap
+# 🎯 Initial Market Focus: Validator Shield™
 
-Phase 1:
-- Secure command gateway
-- Signed API
-- Audit chain
-- Telegram interface
+Sentinel’s first commercial deployment vertical is blockchain validator infrastructure.
 
-Phase 2:
-- Multi-agent orchestration
-- Local LLM integration (Ollama)
-- Content verification system
+Validator operators face:
 
-Phase 3:
-- Agent marketplace integration
-- MCP compatibility
-- gRPC fleet communication
-- WebSocket audit streaming
+- Downtime risk
+- Automation errors
+- Escalation loops
+- Replay attacks
+- Infrastructure compromise
 
-Phase 4:
+Sentinel Validator Shield provides:
+
+- Deterministic enforcement of automation scripts
+- Policy-gated remediation actions
+- Self-healing logic with cryptographic validation
+- Tamper-evident audit trail
+- Controlled automation boundaries
+
+Positioning:
+
+> Self-healing validator automation — with deterministic enforcement.
+
+---
+
+# 👤 Who Sentinel Is For
+
+### 🔹 Validator Operators
+Protect uptime-critical infrastructure from unsafe automation.
+
+### 🔹 AI Agent Builders
+Add deterministic authorization between LLM agents and execution.
+
+### 🔹 DevOps Automation Teams
+Enforce policy before CI/CD or bot-triggered execution.
+
+### 🔹 Multi-Agent Systems
+Ensure no agent bypasses cryptographic and policy validation.
+
+---
+
+# 💰 Monetization Model
+
+Sentinel operates under an Open Core model.
+
+### Open Core (Current)
+Core enforcement engine is open.
+
+### Managed Infrastructure (Immediate Revenue)
+Sentinel Validator Shield™ deployment:
+- VPS setup
+- Policy configuration
+- Automation gating
+- Audit configuration
+- Monitoring integration
+
+### Future Pro Features
 - Distributed enforcement nodes
 - Delegation model
-- Validator economy
 - Cross-agent reputation scoring
+- Enterprise enforcement modules
+- Fleet orchestration
 
 ---
 
-# Vision
+# 🚀 Quick Start (Docker)
 
-Sentinel is not just SCA.
-
-It is an enforcement protocol for the autonomous internet.
-
-As AI agents become infrastructure actors, they require:
-
-- Deterministic control
-- Cryptographic identity
-- Auditable decision systems
-- Resource-bound execution
-- Reputation-based trust
-
-Sentinel aims to become the enforcement layer between autonomy and execution.
+## 1️⃣ Clone
