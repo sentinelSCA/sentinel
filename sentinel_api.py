@@ -676,6 +676,34 @@ def api_v2_list_agents(x_api_key: Optional[str] = Header(default=None)):
     return list_agents()
 
 # ----------------------------
+# System Status
+# ----------------------------
+@app.get("/api/v2/system/status")
+def system_status():
+    try:
+        from queue_redis import get_queue_redis
+        r = get_queue_redis()
+
+        pending = r.llen("ops:actions:proposed")
+        approved = r.llen("ops:actions:approved")
+
+        return {
+            "service": "sentinel",
+            "api": "healthy",
+            "redis": "connected",
+            "pending_actions": pending,
+            "approved_actions": approved,
+      }
+
+    except Exception as e:
+        return {
+            "service": "sentinel",
+            "api": "healthy",
+            "redis": "error",
+            "error": str(e),
+      }
+
+# ----------------------------
 # Route: analyze (main)
 # ----------------------------
 @app.post("/analyze")

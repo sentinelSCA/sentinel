@@ -138,8 +138,44 @@ Sentinel provides:
 • Telemetry and operator dashboard  
 • Python SDK for agent integration
 
+
+## Python SDK
+
+Install locally:
+
+```bash
+pip install ./sdk
+
+Example:
+
+from sentinel_agent import SentinelAgentClient
+
+client = SentinelAgentClient(
+    base_url="https://sentinelsca.com",
+    agent_id="agent_xxx",
+    priv_b64="BASE64_PRIVATE_KEY"
+)
+
+resp = client.analyze({
+    "type": "read_url",
+    "target": "https://example.com/health",
+    "method": "GET"
+})
+
+print(resp["decision"])
+
 ---
 
+## Quick Start
+
+Clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/sentinel.git
+cd sentinel
+
+
+---
 ## Architecture
 
 ```text
