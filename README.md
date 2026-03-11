@@ -1,224 +1,190 @@
-# 🔒 Sentinel SCA
+# Sentinel
 
-## Deterministic Execution Authorization for Autonomous Systems
+Sentinel is an AI agent security gateway that sits between autonomous agents and real infrastructure.
 
-Sentinel SCA is a deterministic enforcement gateway that ensures autonomous systems prove they are authorized to execute **before execution happens**.
-
-It introduces a missing primitive in modern automation:
-
-> Execution must be cryptographically validated and policy-enforced before it is allowed to occur.
-
-Sentinel acts as a control layer between AI agents, automation systems, bots, and real-world execution environments.
+It verifies agent identity, validates signed action requests, applies policy decisions, records tamper-evident audit logs, and routes approved actions through a controlled execution layer.
 
 ---
 
-# 🚨 The Core Problem
+# What Sentinel Does
 
-Autonomous systems today can:
+Sentinel provides:
 
-- Execute shell commands
-- Manage infrastructure
-- Restart services
-- Send emails
-- Post to social platforms
-- Trigger CI/CD pipelines
-- Orchestrate other agents
-
-Most systems rely on:
-- Prompt guardrails
-- Basic API keys
-- Application-level checks
-- Trust in the agent
-
-These are not enforcement mechanisms.
-
-They are suggestions.
-
-Once execution capability exists, lack of deterministic authorization becomes systemic risk.
-
-Sentinel solves this.
+• Ed25519 agent identity and signed requests  
+• Timestamp and replay protection  
+• Strict command validation  
+• Policy-based allow / review / deny decisions  
+• Reputation-aware decision support  
+• Human approval workflow for sensitive actions  
+• Adapter-based executor control  
+• Append-only tamper-evident audit chain  
+• Telemetry and operator dashboard  
+• Python SDK for agent integration
 
 ---
 
-# 🧠 What Sentinel Does
+# Architecture
 
-Sentinel enforces:
-
-- HMAC request signing
-- Timestamp validation
-- Nonce replay protection
-- Deterministic policy evaluation
-- Command allowlisting
-- Resource-limited sandbox execution
-- Append-only audit chain hashing
-- Reputation-based enforcement
-- Multi-agent execution gating
-
-LLMs generate.
-
-Sentinel decides.
-
-No direct execution is trusted.
-
----
-
-# ⚙️ Enforcement Flow
-
-Agent  
-→ Signed Request  
-→ Sentinel Gateway  
-→ Deterministic Policy Engine  
-→ Sandboxed Execution  
-→ Audit Chain Update  
-→ Reputation Update  
-
-Every action is:
-
-- Signed
-- Validated
-- Logged
-- Replay-resistant
-- Tamper-evident
+AI Agent  
+   │  
+   │ signed request  
+   ▼  
+Sentinel API  
+   │  
+   ├─ identity verification  
+   ├─ replay protection  
+   ├─ command validation  
+   ├─ policy engine  
+   │  
+   ▼  
+Decision  
+   │  
+   ├─ allow  → executor  
+   ├─ review → human approval  
+   └─ deny  
+   │  
+   ▼  
+Audit chain + telemetry + dashboard
 
 ---
 
-# 🎯 Initial Market Focus: Validator Shield™
+# Core Components
 
-Sentinel’s first commercial deployment vertical is blockchain validator infrastructure.
+sentinel_api.py  
+Main API entrypoint and decision pipeline.
 
-Validator operators face:
+sentinel_api_with_dashboard.py  
+Homepage and operator dashboard.
 
-- Downtime risk
-- Automation errors
-- Escalation loops
-- Replay attacks
-- Infrastructure compromise
+agent_identity.py  
+Agent registration and Ed25519 identity verification.
 
-Sentinel Validator Shield provides:
+sentinel_core/risk_engine.py  
+Risk scoring and decision evaluation.
 
-- Deterministic enforcement of automation scripts
-- Policy-gated remediation actions
-- Self-healing logic with cryptographic validation
-- Tamper-evident audit trail
-- Controlled automation boundaries
+sentinel_core/action_digest.py  
+Canonical digest generation for actions.
 
-Positioning:
+sentinel_core/audit.py  
+Append-only tamper-evident audit chain.
 
-> Self-healing validator automation — with deterministic enforcement.
+executor_worker.py  
+Controlled execution worker with digest verification.
 
----
-
-# 👤 Who Sentinel Is For
-
-### 🔹 Validator Operators
-Protect uptime-critical infrastructure from unsafe automation.
-
-### 🔹 AI Agent Builders
-Add deterministic authorization between LLM agents and execution.
-
-### 🔹 DevOps Automation Teams
-Enforce policy before CI/CD or bot-triggered execution.
-
-### 🔹 Multi-Agent Systems
-Ensure no agent bypasses cryptographic and policy validation.
+sdk/sentinel_agent/  
+Python SDK for agent integration.
 
 ---
 
-# 💰 Monetization Model
+# Request Protocol
 
-Sentinel operates under an Open Core model.
+Headers
 
-### Open Core (Current)
-Core enforcement engine is open.
+X-Signature  
+X-Timestamp-Unix  
 
-### Managed Infrastructure (Immediate Revenue)
-Sentinel Validator Shield™ deployment:
-- VPS setup
-- Policy configuration
-- Automation gating
-- Audit configuration
-- Monitoring integration
+Body
 
-### Future Pro Features
-- Distributed enforcement nodes
-- Delegation model
-- Cross-agent reputation scoring
-- Enterprise enforcement modules
-- Fleet orchestration
+{
+  "agent_id": "agent_xxx",
+  "command": "{\"type\":\"read_url\",\"target\":\"https://example.com/health\",\"method\":\"GET\"}",
+  "timestamp": "1773214000"
+}
+
+Sentinel verifies:
+
+• agent public key  
+• Ed25519 signature  
+• timestamp freshness  
+• replay protection  
+• command schema  
+• policy outcome
 
 ---
 
-# 🚀 Quick Start (Docker)
+# Python SDK Example
 
-## 1️⃣ Clone
+from sentinel_agent import SentinelAgentClient
 
+client = SentinelAgentClient(
+    base_url="https://sentinelsca.com",
+    agent_id="agent_xxx",
+    priv_b64="BASE64_PRIVATE_KEY"
+)
 
-💼 Sentinel Validator Edition
+resp = client.analyze({
+    "type": "read_url",
+    "target": "https://example.com/health",
+    "method": "GET"
+})
 
-Sentinel Validator Edition is a hardened deployment of Sentinel SCA for Web3 validator operators.
+print(resp["decision"])
 
-It enforces deterministic execution control on validator automation.
+---
 
-What It Protects Against
-	•	Bad remediation scripts
-	•	Escalation loops
-	•	Replay attacks
-	•	Unauthorized restarts
-	•	Automation abuse
-	•	Human error during incidents
+# Dashboard
 
-⸻
+Sentinel includes:
 
-🔒 Validator Hard Lock Policy
+/ — homepage  
+/dashboard — operator dashboard  
+/telemetry — telemetry endpoint
 
-Validator Edition enforces:
-	•	✅ restart_service → sentinel-api → ALLOW
-	•	⚠ restart_service → other services → REVIEW
-	•	❌ Shell execution → DENY
-	•	❌ Arbitrary command execution → DENY
+The dashboard displays:
 
-All actions are:
-	•	Signed
-	•	Timestamp-validated
-	•	Replay-protected
-	•	Audit-chained
-	•	Reputation-adjusted
+• queue state  
+• telemetry panel  
+• recent activity  
+• agent inventory  
+• approval workflow context
 
-⸻
+---
 
-💰 Pricing
+# Current Status
 
-Starter — $49/month per validator
-	•	Sentinel deployment
-	•	Validator hard-lock policy
-	•	Dashboard access
-	•	Audit chain
-	•	Telegram/email alerts
-	•	Guided onboarding
+Sentinel currently includes:
 
-Pro — $149/month
-	•	Up to 5 validators
-	•	Custom policy tuning
-	•	Incident classification support
-	•	Priority assistance
+• signed request verification  
+• Ed25519 agent registration  
+• replay protection  
+• strict command validation  
+• policy engine and reputation logic  
+• digest verification before execution  
+• hash-chained audit log  
+• operator dashboard and telemetry  
+• installable Python SDK
 
-Enterprise: Custom
+---
 
-⸻
+# Repository Layout
 
-🚫 Token Policy
+sentinel/
+├── agent_identity.py
+├── executor_worker.py
+├── sentinel_api.py
+├── sentinel_api_with_dashboard.py
+├── sentinel_core/
+├── sentinel_rules/
+├── templates/
+├── static/
+├── sdk/
+├── docs/
+└── scripts/
 
-Sentinel Validator Edition has no token.
+---
 
-It is security infrastructure.
+# Design Goal
 
-If a token ever exists, it will be separate from the Validator Edition product.
+Sentinel is intentionally simple:
 
-⸻
+verify identity  
+validate actions  
+enforce policy  
+control execution  
+record evidence
 
-🧭 Onboarding
+---
 
-If you operate a validator and want deterministic automation enforcement:
+# License
 
-Email: sentinel.labs.ai@gmail.com
-Or open an issue labeled: validator-onboarding
+Add your project license here.
