@@ -1,5 +1,7 @@
 import os
 import re
+import json
+from pathlib import Path
 from typing import Tuple
 
 POLICY_VERSION = "v2"
@@ -44,6 +46,50 @@ REQUIRE_APPROVAL = [
     if s.strip()
 ]
 
+POLICY_FILE = os.getenv("SENTINEL_POLICY_FILE", "policies/policy.validator.json")
+
+def _load_validator_policy() -> dict | None:
+    try:
+        return json.loads(Path(POLICY_FILE).read_text())
+    except Exception:
+        return None
+
+def _match_validator_rule(rule: dict, cmd_type: str | None, target: str | None) -> bool:
+    match = rule.get("match") or {}
+
+    rule_type = match.get("type")
+    if rule_type is not None and cmd_type != rule_type:
+        return False
+
+    target_in = match.get("target_in")
+    if target_in is not None and target not in target_in:
+        return False
+
+    return True
+
+def _evaluate_validator_policy(cmd_type: str | None, target: str | None):
+    policy = _load_validator_policy()
+    if not policy:
+        return None
+
+    for rule in policy.get("rules", []):
+        if _match_validator_rule(rule, cmd_type, target):
+            decision = str(rule.get("decision", "deny"))
+            risk = str(rule.get("risk", "high"))
+            reason = str(rule.get("reason", "Matched validator policy rule."))
+            score = 0.05 if decision == "allow" else 0.90 if decision == "review" else 0.95
+            return (decision, risk, score, reason)
+
+    defaults = policy.get("defaults") or {}
+    if defaults:
+        decision = str(defaults.get("decision", "deny"))
+        risk = str(defaults.get("risk", "high"))
+        reason = str(defaults.get("reason", "Command not allowed by validator policy."))
+        score = 0.05 if decision == "allow" else 0.90 if decision == "review" else 0.95
+        return (decision, risk, score, reason)
+
+    return None
+
 def evaluate_command_v2(command: str, reputation: int) -> Tuple[str, str, float, str]:
     """
     Returns: (decision, risk, risk_score, reason)
@@ -65,12 +111,9 @@ def evaluate_command_v2(command: str, reputation: int) -> Tuple[str, str, float,
         cmd_type = None
         target = None
 
-    # Allow restart ONLY for sentinel-api
-    if cmd_type == "restart_service":
-        if target == "sentinel-api":
-            return "allow", "low", 0.05, "Validator edition: sentinel-api restart allowed."
-        else:
-            return "review", "high", 0.90, "Validator edition: restart requires human approval."
+    policy_result = _evaluate_validator_policy(cmd_type, target)
+    if policy_result is not None:
+        return policy_result
 
     # 1) Reputation gate first (overrides everything)
     if reputation <= REP_DENY_AT:

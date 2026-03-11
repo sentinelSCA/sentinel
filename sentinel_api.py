@@ -14,6 +14,7 @@ from agent_registry import suspend_agent
 from sentinel_core.risk_engine import score_action
 from sentinel_core.audit import write_audit_log as append_audit_log
 from sentinel_core.action_digest import canonical_action_digest
+from agent_identity import get_agent
 
 import base64
 import requests
@@ -43,10 +44,29 @@ from sentinel_core.replay_db import ensure_schema, check_and_set
 from reputation_redis import get_rep, apply_outcome
 
 # Agent identity module (your repo file)
-from agent_identity import register_agent, get_agent, revoke_agent
+from agent_identity import register_agent, get_agent, revoke_agent, suspend_agent_identity, activate_agent_identity
 from queue_redis import get_queue_redis
 import secrets
 from fastapi import HTTPException
+
+import base64
+import json
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+
+def verify_ed25519_signature(pub_b64: str, payload: dict, signature_b64: str) -> bool:
+    try:
+        msg = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+        pub_bytes = base64.b64decode(pub_b64)
+        sig_bytes = base64.b64decode(signature_b64)
+
+        pub = Ed25519PublicKey.from_public_bytes(pub_bytes)
+        pub.verify(sig_bytes, msg)
+
+        return True
+    except Exception:
+        return False
 
 # ----------------------------
 # Env / constants
@@ -302,6 +322,45 @@ def _audit_hmac(data: str) -> str:
 
 
 
+def parse_and_validate_command(command_str: str) -> dict:
+    try:
+        cmd = json.loads(command_str)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid command JSON")
+
+    if not isinstance(cmd, dict):
+        raise HTTPException(status_code=400, detail="Command must be a JSON object")
+
+    action_type = cmd.get("type")
+    if not isinstance(action_type, str) or not action_type.strip():
+        raise HTTPException(status_code=400, detail="Missing command type")
+
+    allowed_types = {
+        "read_url",
+        "restart_service",
+        "scale_service",
+        "clear_cache",
+        "rotate_keys",
+    }
+
+    if action_type not in allowed_types:
+        raise HTTPException(status_code=400, detail=f"Unknown action type: {action_type}")
+
+    allowed_fields_by_type = {
+        "read_url": {"type", "target", "method", "reason"},
+        "restart_service": {"type", "target", "reason"},
+        "scale_service": {"type", "target", "replicas", "reason"},
+        "clear_cache": {"type", "target", "reason"},
+        "rotate_keys": {"type", "target", "reason"},
+    }
+
+    unknown = set(cmd.keys()) - allowed_fields_by_type[action_type]
+    if unknown:
+        raise HTTPException(status_code=400, detail=f"Unknown fields for {action_type}: {sorted(unknown)}")
+
+    return cmd
+
+
 # ----------------------------
 # Models
 # ----------------------------
@@ -545,15 +604,6 @@ def register_agent(req: RegisterAgentRequest, x_api_key: str = Header(default=No
         "api_key": api_key
     }
 
-class SuspendAgentRequest(BaseModel):
-    agent_id: str
-
-
-@app.post("/api/v2/agents/suspend")
-def api_suspend(req: SuspendAgentRequest, x_api_key: str = Header(default=None)):
-    _require_api_key(x_api_key)
-    suspend_agent(req.agent_id)
-    return {"status": "suspended"}
 # ----------------------------
 # Route: suspend agent
 # ----------------------------
@@ -564,27 +614,14 @@ class SuspendAgentRequest(BaseModel):
 @app.post("/api/v2/agents/suspend")
 def suspend_agent(req: SuspendAgentRequest, x_api_key: str = Header(default=None)):
     _require_api_key(x_api_key)
-
-    agents_file = "agents.json"
-
     try:
-        with open(agents_file, "r") as f:
-            agents = json.load(f)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Could not load agents.json")
-
-    if req.agent_id not in agents:
-        raise HTTPException(status_code=404, detail="Agent not found")
-
-    agents[req.agent_id]["status"] = "suspended"
-    agents[req.agent_id]["suspended_at"] = int(time.time())
-
-    with open(agents_file, "w") as f:
-        json.dump(agents, f, indent=2)
-
+        result = suspend_agent_identity(req.agent_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     return {
         "status": "success",
-        "agent_id": req.agent_id,
+        "agent_id": result["agent_id"],
+        "revoked": result["revoked"],
         "new_state": "suspended"
     }
 
@@ -598,28 +635,14 @@ class ActivateAgentRequest(BaseModel):
 @app.post("/api/v2/agents/activate")
 def activate_agent(req: ActivateAgentRequest, x_api_key: str = Header(default=None)):
     _require_api_key(x_api_key)
-
-    agents_file = "/app/agents.json"
-
     try:
-        with open(agents_file, "r") as f:
-            agents = json.load(f)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Could not load agents.json")
-
-    if req.agent_id not in agents:
-        raise HTTPException(status_code=404, detail="Agent not found")
-
-    agents[req.agent_id]["status"] = "active"
-    agents[req.agent_id]["activated_at"] = int(time.time())
-    agents[req.agent_id].pop("suspended_at", None)
-
-    with open(agents_file, "w") as f:
-        json.dump(agents, f, indent=2)
-
+        result = activate_agent_identity(req.agent_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     return {
         "status": "success",
-        "agent_id": req.agent_id,
+        "agent_id": result["agent_id"],
+        "revoked": result["revoked"],
         "new_state": "active"
     }
 
@@ -646,6 +669,12 @@ def api_v2_revoke(req: RevokeAgentReq, x_api_key: Optional[str] = Header(default
     _require_api_key(x_api_key)
     return revoke_agent(req.agent_id, req.reason)
 
+@app.get("/api/v2/agents")
+def api_v2_list_agents(x_api_key: Optional[str] = Header(default=None)):
+    _require_api_key(x_api_key)
+    from agent_identity import list_agents
+    return list_agents()
+
 # ----------------------------
 # Route: analyze (main)
 # ----------------------------
@@ -670,35 +699,6 @@ def analyze(
 
     _rate_limit(req.agent_id)
 
-    # Agent API key auth (dynamic from agents.json)
-    api_key = x_api_key or request.headers.get("X-API-Key")
-
-    try:
-        with open("/app/agents.json", "r") as f:
-            agents_runtime = json.load(f)
-
-    except Exception:
-        agents_runtime = {}
-
-    agent = agents_runtime.get(req.agent_id)
-
-    if not agent:
-        return {
-            "decision": "deny",
-            "reason": "agent_not_registered"
-        }
-
-    if agent.get("api_key") != api_key:
-        return {
-            "decision": "deny",
-            "reason": "invalid_api_key"
-        }
-
-    if agent.get("status") == "suspended":
-        return {
-            "decision": "deny",
-            "reason": "agent_suspended"
-        }
     # Signed mode: require signature headers if secret is set
     if SIGNING_SECRET:
         if not x_signature or not x_timestamp_unix:
@@ -721,6 +721,17 @@ def analyze(
             replay_by_agent[req.agent_id] += 1
             raise HTTPException(status_code=409, detail="Replay detected")
 
+        from agent_identity import get_agent
+        agent_info = get_agent(req.agent_id)
+
+        if not agent_info:
+            raise HTTPException(status_code=401, detail="Unknown agent")
+
+        if agent_info.get("revoked"):
+            raise HTTPException(status_code=403, detail="Agent revoked")
+
+        pub_b64 = agent_info["pub_b64"]
+
         # Verify signature
         signed_payload = {
             "agent_id": req.agent_id,
@@ -728,11 +739,12 @@ def analyze(
             "timestamp": req.timestamp,
             "ts_unix": x_timestamp_unix,
         }
-        expected = _sign_payload(signed_payload)
-        if not hmac.compare_digest(expected, x_signature):
+        if not verify_ed25519_signature(pub_b64, signed_payload, x_signature):
             _m_inc("http_401_total")
             unauthorized_by_agent[req.agent_id] += 1
             raise HTTPException(status_code=401, detail="Bad signature")
+
+    validated_command = parse_and_validate_command(req.command)
 
     # Legacy local reputation state
     db = load_reputation_db()
