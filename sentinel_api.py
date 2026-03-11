@@ -3,16 +3,28 @@ import hmac
 import hashlib
 import json
 import os
+
+OPS_PROPOSED_Q = os.getenv("OPS_PROPOSED_Q", "ops:actions:proposed").strip()
 import logging
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, Deque, Tuple, List
+
+from agent_registry import suspend_agent
+from sentinel_core.risk_engine import score_action
+from sentinel_core.audit import write_audit_log as append_audit_log
+from sentinel_core.action_digest import canonical_action_digest
 
 import base64
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
+from ops_digest import digest_action
+import json
+
+with open("agents.json") as f:
+    AGENTS = json.load(f)
 
 # Policy + core
 from sentinel_rules.policy_v2 import evaluate_command_v2
@@ -32,7 +44,9 @@ from reputation_redis import get_rep, apply_outcome
 
 # Agent identity module (your repo file)
 from agent_identity import register_agent, get_agent, revoke_agent
-
+from queue_redis import get_queue_redis
+import secrets
+from fastapi import HTTPException
 
 # ----------------------------
 # Env / constants
@@ -93,24 +107,10 @@ if STRICT_MODE:
 # ----------------------------
 PROM_ENABLED = False
 try:
-    from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST  # type: ignore
-
+    from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
     PROM_ENABLED = True
-    prom_requests_total = Counter("sentinel_requests_total", "Total requests received")
-    prom_requests_ok = Counter("sentinel_requests_ok", "Requests completed successfully (200)")
-    prom_http_401_total = Counter("sentinel_http_401_total", "Unauthorized responses")
-    prom_http_409_total = Counter("sentinel_http_409_total", "Replay detected responses")
-    prom_http_429_total = Counter("sentinel_http_429_total", "Rate limited responses")
-    prom_http_503_total = Counter("sentinel_http_503_total", "Global freeze responses")
-    prom_decision_allow_total = Counter("sentinel_decision_allow_total", "Allow decisions")
-    prom_decision_deny_total = Counter("sentinel_decision_deny_total", "Deny decisions")
-    prom_decision_review_total = Counter("sentinel_decision_review_total", "Review decisions")
-    prom_replay_detected_total = Counter("sentinel_replay_detected_total", "Replays blocked")
-    prom_rate_limited_total = Counter("sentinel_rate_limited_total", "Requests blocked by rate limit")
-    prom_agents_seen = Gauge("sentinel_agents_seen", "Number of unique agents seen since startup")
 except Exception:
     PROM_ENABLED = False
-
 # Fallback text metrics (if prometheus_client not available)
 metrics = {
     "requests_total": 0,
@@ -300,110 +300,6 @@ def _audit_hmac(data: str) -> str:
     return hmac.new(secret.encode("utf-8"), data.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
-def _read_prev_hash(state_path: str) -> str:
-    try:
-        with open(state_path, "r", encoding="utf-8") as f:
-            return f.read().strip() or "GENESIS"
-    except FileNotFoundError:
-        return "GENESIS"
-
-
-def _write_prev_hash(state_path: str, new_hash: str) -> None:
-    with open(state_path, "w", encoding="utf-8") as f:
-        f.write(new_hash)
-
-
-def write_audit_log(request: Request, result: dict) -> None:
-    log_dir = os.getenv("SENTINEL_LOG_DIR", "logs")
-    os.makedirs(log_dir, exist_ok=True)
-
-    audit_path = os.path.join(log_dir, "audit.jsonl")
-    state_path = os.path.join(log_dir, "audit.state")
-    head_path = os.path.join(log_dir, "audit_head.txt")
-
-    prev_hash = _read_prev_hash(state_path)
-
-    entry = {
-        "ts": datetime.now(timezone.utc).isoformat(),
-        "client_ip": getattr(getattr(request, "client", None), "host", None),
-        "agent_id": result.get("agent_id"),
-        "command": result.get("command"),
-        "decision": result.get("decision"),
-        "risk": result.get("risk"),
-        "risk_score": result.get("risk_score"),
-        "reason": result.get("reason"),
-        "policy_version": result.get("policy_version"),
-        "vt": result.get("vt"),
-        "prev_hash": prev_hash,
-    }
-
-    entry_json = json.dumps(entry, sort_keys=True, separators=(",", ":"))
-    chain_input = prev_hash + "|" + entry_json
-    entry_hash = hashlib.sha256(chain_input.encode("utf-8")).hexdigest()
-    sig = _audit_hmac(entry_hash)
-
-    record = dict(entry)
-    record["hash"] = entry_hash
-    record["sig"] = sig
-
-    with open(audit_path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
-
-    _write_prev_hash(state_path, entry_hash)
-    with open(head_path, "w", encoding="utf-8") as f:
-        f.write(entry_hash + "\n")
-
-
-def get_audit_head() -> dict:
-    log_dir = os.getenv("SENTINEL_LOG_DIR", "logs")
-    head = _read_prev_hash(os.path.join(log_dir, "audit.state"))
-    return {
-        "audit_head": head,
-        "audit_head_sig": _audit_hmac(head),
-    }
-
-
-def verify_audit_chain() -> dict:
-    log_dir = os.getenv("SENTINEL_LOG_DIR", "logs")
-    audit_path = os.path.join(log_dir, "audit.jsonl")
-
-    if not os.path.exists(audit_path):
-        return {"ok": True, "message": "No audit file yet"}
-
-    prev = "GENESIS"
-    line_no = 0
-
-    with open(audit_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line_no += 1
-            line = line.strip()
-            if not line:
-                continue
-            rec = json.loads(line)
-
-            entry = {k: rec.get(k) for k in [
-                "ts", "client_ip", "agent_id", "command", "decision", "risk",
-                "risk_score", "reason", "policy_version", "vt", "prev_hash"
-            ]}
-
-            entry_json = json.dumps(entry, sort_keys=True, separators=(",", ":"))
-            expected = hashlib.sha256((prev + "|" + entry_json).encode("utf-8")).hexdigest()
-
-            if rec.get("prev_hash") != prev:
-                return {"ok": False, "line": line_no, "error": "prev_hash mismatch"}
-
-            if rec.get("hash") != expected:
-                return {"ok": False, "line": line_no, "error": "hash mismatch"}
-
-            secret = os.getenv("SENTINEL_AUDIT_SECRET", "").strip()
-            if secret:
-                expected_sig = hmac.new(secret.encode("utf-8"), expected.encode("utf-8"), hashlib.sha256).hexdigest()
-                if rec.get("sig") != expected_sig:
-                    return {"ok": False, "line": line_no, "error": "sig mismatch"}
-
-            prev = rec["hash"]
-
-    return {"ok": True, "lines": line_no}
 
 
 # ----------------------------
@@ -518,6 +414,24 @@ def audit_verify():
 def audit_head():
     return get_audit_head()
 
+@app.post("/api/v2/agents/rotate_key")
+def rotate_agent_key(agent_id: str, x_api_key: Optional[str] = Header(default=None)):
+    _require_api_key(x_api_key)
+
+    if agent_id not in AGENTS:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    new_key = secrets.token_hex(24)
+    AGENTS[agent_id]["api_key"] = new_key
+
+    with open("agents.json", "w") as f:
+        json.dump(AGENTS, f, indent=2)
+
+    return {
+        "status": "success",
+        "agent_id": agent_id,
+        "new_api_key": new_key
+    }
 
 # ----------------------------
 # Routes: reputation (Redis)
@@ -581,6 +495,133 @@ def status(
         },
     }
 
+# ----------------------------
+# Route: register agent
+# ----------------------------
+from pydantic import BaseModel
+import secrets
+import time
+import json
+
+class RegisterAgentRequest(BaseModel):
+    name: str
+
+
+@app.post("/api/v2/agents/register")
+def register_agent(req: RegisterAgentRequest, x_api_key: str = Header(default=None)):
+
+    # Admin authentication
+    _require_api_key(x_api_key)
+
+    agents_file = "/app/agents.json"
+
+    try:
+        with open(agents_file, "r") as f:
+            agents = json.load(f)
+    except Exception:
+        agents = {}
+
+    # create agent identity
+    agent_id = "agent" + secrets.token_hex(4)
+    api_key = secrets.token_hex(24)
+
+    agents[agent_id] = {
+        "name": req.name,
+        "api_key": api_key,
+        "status": "active",
+        "created_at": int(time.time()),
+        "reputation": 0,
+        "allowed": 0,
+        "blocked": 0,
+        "reviewed": 0
+    }
+
+    with open(agents_file, "w") as f:
+        json.dump(agents, f, indent=2)
+
+    return {
+        "status": "success",
+        "agent_id": agent_id,
+        "api_key": api_key
+    }
+
+class SuspendAgentRequest(BaseModel):
+    agent_id: str
+
+
+@app.post("/api/v2/agents/suspend")
+def api_suspend(req: SuspendAgentRequest, x_api_key: str = Header(default=None)):
+    _require_api_key(x_api_key)
+    suspend_agent(req.agent_id)
+    return {"status": "suspended"}
+# ----------------------------
+# Route: suspend agent
+# ----------------------------
+class SuspendAgentRequest(BaseModel):
+    agent_id: str
+
+
+@app.post("/api/v2/agents/suspend")
+def suspend_agent(req: SuspendAgentRequest, x_api_key: str = Header(default=None)):
+    _require_api_key(x_api_key)
+
+    agents_file = "agents.json"
+
+    try:
+        with open(agents_file, "r") as f:
+            agents = json.load(f)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Could not load agents.json")
+
+    if req.agent_id not in agents:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    agents[req.agent_id]["status"] = "suspended"
+    agents[req.agent_id]["suspended_at"] = int(time.time())
+
+    with open(agents_file, "w") as f:
+        json.dump(agents, f, indent=2)
+
+    return {
+        "status": "success",
+        "agent_id": req.agent_id,
+        "new_state": "suspended"
+    }
+
+# ----------------------------
+# Route: activate agent
+# ----------------------------
+class ActivateAgentRequest(BaseModel):
+    agent_id: str
+
+
+@app.post("/api/v2/agents/activate")
+def activate_agent(req: ActivateAgentRequest, x_api_key: str = Header(default=None)):
+    _require_api_key(x_api_key)
+
+    agents_file = "/app/agents.json"
+
+    try:
+        with open(agents_file, "r") as f:
+            agents = json.load(f)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Could not load agents.json")
+
+    if req.agent_id not in agents:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    agents[req.agent_id]["status"] = "active"
+    agents[req.agent_id]["activated_at"] = int(time.time())
+    agents[req.agent_id].pop("suspended_at", None)
+
+    with open(agents_file, "w") as f:
+        json.dump(agents, f, indent=2)
+
+    return {
+        "status": "success",
+        "agent_id": req.agent_id,
+        "new_state": "active"
+    }
 
 # ----------------------------
 # Agent Identity (Ed25519) v2
@@ -605,11 +646,10 @@ def api_v2_revoke(req: RevokeAgentReq, x_api_key: Optional[str] = Header(default
     _require_api_key(x_api_key)
     return revoke_agent(req.agent_id, req.reason)
 
-
 # ----------------------------
 # Route: analyze (main)
 # ----------------------------
-@app.post("/analyze", response_model=AnalyzeResponse)
+@app.post("/analyze")
 def analyze(
     req: AnalyzeRequest,
     request: Request,
@@ -617,6 +657,9 @@ def analyze(
     x_signature: Optional[str] = Header(default=None),
     x_timestamp_unix: Optional[str] = Header(default=None),
 ):
+
+    action_digest = canonical_action_digest(req.command)
+
     _m_inc("requests_total")
     agents_seen.add(req.agent_id)
     _m_agents_seen_update()
@@ -627,13 +670,35 @@ def analyze(
 
     _rate_limit(req.agent_id)
 
-    # API key auth
-    try:
-        _require_api_key(x_api_key)
-    except HTTPException:
-        unauthorized_by_agent[req.agent_id] += 1
-        raise
+    # Agent API key auth (dynamic from agents.json)
+    api_key = x_api_key or request.headers.get("X-API-Key")
 
+    try:
+        with open("/app/agents.json", "r") as f:
+            agents_runtime = json.load(f)
+
+    except Exception:
+        agents_runtime = {}
+
+    agent = agents_runtime.get(req.agent_id)
+
+    if not agent:
+        return {
+            "decision": "deny",
+            "reason": "agent_not_registered"
+        }
+
+    if agent.get("api_key") != api_key:
+        return {
+            "decision": "deny",
+            "reason": "invalid_api_key"
+        }
+
+    if agent.get("status") == "suspended":
+        return {
+            "decision": "deny",
+            "reason": "agent_suspended"
+        }
     # Signed mode: require signature headers if secret is set
     if SIGNING_SECRET:
         if not x_signature or not x_timestamp_unix:
@@ -693,7 +758,54 @@ def analyze(
             score = max(score, 0.65)
             reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_REVIEW:.2f}"
 
-    # Counters
+    # ENQUEUE_REVIEW_TO_OPS_PROPOSED_Q
+
+    # If policy says "review", enqueue a proposed action for the approver bot
+    # using "canonical record + id delivery" protocol.
+    if decision == "review":
+        try:
+            import hashlib
+            import time
+            now = int(time.time())
+
+            try:
+                parsed = json.loads(req.command) if isinstance(req.command, str) else {}
+            except Exception:
+                parsed = {}
+
+            action = {
+                "type": parsed.get("type", "unknown"),
+                "target": parsed.get("target", "unknown"),
+                "reason": parsed.get("reason", "policy review"),
+                "params": parsed.get("params", {}) if isinstance(parsed.get("params", {}), dict) else {},
+            }
+
+            action_id = f"api_{now}_{hashlib.sha256((req.agent_id + req.command).encode()).hexdigest()[:6]}"
+            digest = digest_action(action)
+
+            msg = {
+                "action_id": action_id,
+                "action": action,
+                "created_ts": now,
+                "expires_ts": now + 900,
+                "digest": digest,
+                "manager": "api_analyze",
+                "recommended_confidence": 0.9,
+                "status": "proposed",
+            }
+
+            r = get_queue_redis()
+            record_key = f"ops:actions:record:{action_id}"
+            r.setex(record_key, 900, json.dumps(msg, separators=(",", ":")))
+            r.rpush(OPS_PROPOSED_Q, action_id)
+
+            print("ENQUEUE_REVIEW ok:", action_id, flush=True)
+        except Exception as e:
+            print("ENQUEUE_REVIEW failed:", repr(e), flush=True)
+            pass
+
+
+# Counters
     if decision == "deny":
         deny_by_agent[req.agent_id] += 1
         denied_commands[req.command] += 1
@@ -762,5 +874,42 @@ def analyze(
         (req.command or "")[:200],
     )
 
-    write_audit_log(request, body)
+    append_audit_log("decision", {
+        "agent_id": req.agent_id,
+        "command": req.command,
+        "decision": body.get("decision"),
+        "risk": body.get("risk"),
+        "risk_score": body.get("risk_score"),
+        "reason": body.get("reason"),
+        "policy_version": body.get("policy_version"),
+        "vt": body.get("vt"),
+        "action_digest": action_digest
+    })
+
     return AnalyzeResponse(**body, signature=resp_sig)
+
+@app.get("/telemetry", include_in_schema=False)
+def telemetry():
+    def safe_len(key: str) -> int:
+        try:
+            return int(r.llen(key))
+        except Exception:
+            return 0
+
+    try:
+        agents = len(agents_seen)
+    except Exception:
+        agents = 0
+
+    return {
+        "agents_seen": agents,
+        "queues": {
+            "incidents": safe_len("ops:incidents"),
+            "triaged": safe_len("ops:incidents:triaged"),
+            "proposed": safe_len("ops:actions:proposed"),
+            "needs_human": safe_len("ops:actions:needs_human"),
+            "approved": safe_len("ops:actions:approved"),
+            "executed": safe_len("ops:actions:executed"),
+            "rejected": safe_len("ops:actions:rejected"),
+        },
+    }

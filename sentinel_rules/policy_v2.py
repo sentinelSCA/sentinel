@@ -52,6 +52,26 @@ def evaluate_command_v2(command: str, reputation: int) -> Tuple[str, str, float,
 
     cmd = (command or "").strip()
 
+# ===============================
+    # VALIDATOR EDITION HARD LOCK
+    # ===============================
+
+    try:
+        import json
+        parsed = json.loads(cmd)
+        cmd_type = parsed.get("type")
+        target = parsed.get("target")
+    except Exception:
+        cmd_type = None
+        target = None
+
+    # Allow restart ONLY for sentinel-api
+    if cmd_type == "restart_service":
+        if target == "sentinel-api":
+            return "allow", "low", 0.05, "Validator edition: sentinel-api restart allowed."
+        else:
+            return "review", "high", 0.90, "Validator edition: restart requires human approval."
+
     # 1) Reputation gate first (overrides everything)
     if reputation <= REP_DENY_AT:
         return ("deny", "high", 0.99, f"Reputation too low (<= {REP_DENY_AT})")

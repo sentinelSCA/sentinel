@@ -1,0 +1,29 @@
+{
+  "version": "validator-v2",
+  "defaults": {
+    "decision": "deny",
+    "risk": "high",
+    "reason": "Command not allowed by validator policy."
+  },
+  "rules": [
+    {
+      "id": "allow_restart_sentinel_api",
+      "match": {
+        "type": "restart_service",
+        "target_in": ["sentinel-api"]
+      },
+      "decision": "allow",
+      "risk": "low",
+      "reason": "Validator edition: sentinel-api restart allowed."
+    },
+    {
+      "id": "review_restart_other_services",
+      "match": {
+        "type": "restart_service"
+      },
+      "decision": "review",
+      "risk": "high",
+      "reason": "Restarting other services requires human approval."
+    }
+  ]
+}
