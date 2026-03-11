@@ -1,0 +1,125 @@
+services:
+  redis:
+    image: redis:7
+    container_name: sentinel-redis
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+
+  sentinel-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    ports:
+      - "127.0.0.1:8001:8001"
+    volumes:
+      - ./policies:/app/policies:ro
+      - ./agents.json:/app/agents.json
+      - ./static:/app/static
+      - ./audit:/app/audit
+    command: ["uvicorn", "sentinel_api_with_dashboard:app", "--host", "0.0.0.0", "--port", "8001"]
+
+  manager-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    container_name: sentinel-manager-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: ["python", "-u", "worker_manager.py"]
+
+  executor-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.executor
+    container_name: sentinel-executor-worker
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      ALLOWED_TYPES: restart_service
+      ALLOWED_TARGETS: sentinel-api
+
+    depends_on:
+      - redis
+      - sentinel-api
+    command: ["python", "-u", "executor_worker.py"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/app
+
+  approver-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    container_name: sentinel-approver-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: ["python", "-u", "approver_bot.py"]
+
+  probe-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    container_name: sentinel-probe-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - sentinel-api
+    command: ["python", "-u", "worker_probe.py"]
+
+  reaper-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    container_name: sentinel-reaper-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: ["python", "-u", "worker_reaper.py"]
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: sentinel-portainer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: sentinel-dozzle
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9002:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  redis_data:
+  portainer_data:

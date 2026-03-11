@@ -76,3 +76,9 @@ def qpop(queue_name: str, timeout: int = 0) -> dict | None:
         return None
 
     return _unwrap(obj)
+
+
+# --- Compatibility wrapper for sentinel_api enqueue path ---
+def get_queue_redis():
+    # queue_redis.py already uses a module-level redis client named `r`
+    return r

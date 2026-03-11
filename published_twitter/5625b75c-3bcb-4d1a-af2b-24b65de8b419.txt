@@ -1,0 +1,1 @@
+SCA test: publish file mode should create a NEW file with current timestamp.

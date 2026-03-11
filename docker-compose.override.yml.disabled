@@ -1,0 +1,47 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: sentinel-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: sentinel-dozzle
+    restart: unless-stopped
+    ports:
+      - "9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOZZLE_TAILSIZE=300
+      - DOZZLE_LEVEL=info
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: sentinel-redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+
+  probe-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    command: ["python", "-u", "worker_probe.py"]
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - sentinel-api
+
+volumes:
+  portainer_data:
+  redisinsight_data:

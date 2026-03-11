@@ -192,6 +192,55 @@ def revoke_agent(agent_id: str) -> Dict[str, Any]:
     finally:
         conn.close()
 
+
+def suspend_agent_identity(agent_id: str) -> Dict[str, Any]:
+    return revoke_agent(agent_id)
+
+
+def activate_agent_identity(agent_id: str) -> Dict[str, Any]:
+    _ensure_schema()
+    agent_id = (agent_id or "").strip()
+    if not agent_id:
+        raise ValueError("agent_id required")
+
+    conn = _connect()
+    try:
+        cur = conn.execute("SELECT agent_id FROM agents WHERE agent_id = ?", (agent_id,))
+        row = cur.fetchone()
+        if not row:
+            raise ValueError("Agent not found")
+
+        conn.execute("UPDATE agents SET revoked = 0 WHERE agent_id = ?", (agent_id,))
+        conn.commit()
+        return {"agent_id": agent_id, "revoked": False}
+    finally:
+        conn.close()
+
+def list_agents() -> list[dict]:
+    _ensure_schema()
+
+    conn = _connect()
+    try:
+        cur = conn.execute(
+            "SELECT agent_id, pub_b64, display_name, metadata_json, revoked, created_ts FROM agents ORDER BY created_ts DESC"
+        )
+
+        rows = cur.fetchall()
+
+        return [
+            {
+                "agent_id": row["agent_id"],
+                "pub_b64": row["pub_b64"],
+                "display_name": row["display_name"],
+                "metadata": json.loads(row["metadata_json"] or "{}"),
+                "revoked": bool(row["revoked"]),
+                "created_ts": int(row["created_ts"]),
+            }
+            for row in rows
+        ]
+    finally:
+        conn.close()
+
 # ----------------------------
 # Optional: your existing keypair generator
 # (If you already have one, keep yours; this is a fallback)

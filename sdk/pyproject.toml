@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-agent"
+version = "0.1.0"
+description = "Minimal Python SDK for the Sentinel AI agent security gateway"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["requests","cryptography"]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sentinel_agent*"]
