@@ -16,3 +16,11 @@ logs/
 
 # OS junk
 .DS_Store
+
+# Python build artifacts
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.pyc
+.venv*
