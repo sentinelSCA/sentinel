@@ -267,6 +267,12 @@ TRUSTED INFRASTRUCTURE
 Docker / APIs / Services
 ```
 
+For detailed architecture documentation see:
+
+docs/architecture/system.md
+
+---
+
 Sentinel is a security gateway that verifies agent identity, applies policy to signed actions, and only allows approved actions to reach infrastructure through controlled execution paths.
 
 # Core Components
