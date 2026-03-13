@@ -176,6 +176,16 @@ cd sentinel
 
 
 ---
+
+## Architecture Overview
+
+Sentinel acts as a **security control plane for autonomous AI agents**.
+
+It sits between AI agents and the infrastructure they control, enforcing
+deterministic policy decisions before actions are executed.
+
+---
+
 ## Architecture
 
 ```text
