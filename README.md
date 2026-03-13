@@ -8,7 +8,7 @@
 
 Deterministic execution firewall for AI agents.
 
-Is an AI agent security gateway that sits between autonomous agents and real infrastructure.
+Sentinel is an AI agent security gateway that sits between autonomous agents and real infrastructure.
 
 It verifies agent identity, validates signed action requests, applies policy decisions, records tamper-evident audit logs, and routes approved actions through a controlled execution layer.
 
