@@ -1,0 +1,112 @@
+import os, time, json, urllib.request
+import redis
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0").strip()
+
+TRIAGED_Q = os.getenv("OPS_INCIDENTS_TRIAGED_Q", "ops:incidents:triaged").strip()
+DECISIONS_Q = os.getenv("OPS_MANAGER_DECISIONS_Q", "ops:manager:decisions").strip()
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip().strip('"')
+TELEGRAM_ADMIN_CHAT_ID = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip().strip('"')
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://sentinel-api:8001").strip()
+
+# Daily report time (local time inside container). Keep simple:
+REPORT_HOUR = int(os.getenv("NOTIFY_REPORT_HOUR", "9"))    # 9am
+REPORT_MIN  = int(os.getenv("NOTIFY_REPORT_MIN", "0"))     # :00
+
+POLL_SEC = float(os.getenv("NOTIFY_POLL_SEC", "1.0"))
+
+r = redis.from_url(REDIS_URL, decode_responses=True)
+
+def tg_send(text: str):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_ADMIN_CHAT_ID:
+        return
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = json.dumps({
+        "chat_id": TELEGRAM_ADMIN_CHAT_ID,
+        "text": text,
+        "disable_web_page_preview": True,
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type":"application/json"})
+    try:
+        urllib.request.urlopen(req, timeout=10).read()
+    except Exception:
+        # don’t crash on telegram errors
+        pass
+
+def http_get(path: str, timeout=5):
+    try:
+        return urllib.request.urlopen(f"{API_BASE_URL}{path}", timeout=timeout).read().decode("utf-8")
+    except Exception as e:
+        return f"error: {str(e)[:160]}"
+
+def daily_report():
+    # lightweight “ops dashboard”
+    health = http_get("/health", timeout=3)
+    q = lambda k: r.llen(k)
+
+    lines = [
+        "🧭 Sentinel Daily Status",
+        f"health: {health}",
+        f"queues: proposed={q('ops:actions:proposed')} approved={q('ops:actions:approved')} executed={q('ops:actions:executed')} rejected={q('ops:actions:rejected')}",
+        f"content: writer={q('tasks:writer')} verify={q('tasks:verify')} tw_pub={q('tasks:publish:twitter')} email_pub={q('tasks:publish:email')}",
+        f"triaged={q(TRIAGED_Q)} decisions={q(DECISIONS_Q)}",
+    ]
+    tg_send("\n".join(lines))
+
+def should_report(now_struct, last_sent_day):
+    return (now_struct.tm_hour == REPORT_HOUR and
+            now_struct.tm_min == REPORT_MIN and
+            now_struct.tm_yday != last_sent_day)
+
+def run():
+    print("telegram-notifier started.", flush=True)
+    print("TRIAGED_Q =", TRIAGED_Q, flush=True)
+    print("REPORT_HOUR:MIN =", REPORT_HOUR, REPORT_MIN, flush=True)
+
+    last_report_yday = -1
+
+    while True:
+        # Daily report check
+        now = time.localtime()
+        if should_report(now, last_report_yday):
+            daily_report()
+            last_report_yday = now.tm_yday
+
+        # Incident alert (block a little, then loop)
+        item = r.blpop(TRIAGED_Q, timeout=2)
+        if item:
+            _, payload = item
+            try:
+                triaged = json.loads(payload)
+            except Exception:
+                triaged = None
+
+            if triaged:
+                sev = (triaged.get("severity") or "").lower()
+                inc = triaged.get("incident") or {}
+                kind = inc.get("kind")
+                svc  = inc.get("service")
+                inc_id = inc.get("incident_id")
+                rec = triaged.get("recommendation") or {}
+                rec_t = rec.get("type")
+                rec_target = rec.get("target")
+                why = rec.get("reason")
+
+                if sev in ("critical", "high"):
+                    msg = (
+                        f"🚨 Incident ({sev})\n"
+                        f"service: {svc}\n"
+                        f"kind: {kind}\n"
+                        f"id: {inc_id}\n"
+                        f"recommend: {rec_t} → {rec_target}\n"
+                        f"reason: {why}"
+                    )
+                    tg_send(msg)
+
+        time.sleep(POLL_SEC)
+
+if __name__ == "__main__":
+    run()
+
