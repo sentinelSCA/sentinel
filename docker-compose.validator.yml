@@ -28,6 +28,7 @@ services:
       - ./agents.json:/app/agents.json
       - ./static:/app/static
       - ./audit:/app/audit
+      - ./sentinel.db:/app/sentinel.db
     command: ["uvicorn", "sentinel_api_with_dashboard:app", "--host", "0.0.0.0", "--port", "8001"]
 
   manager-worker:
