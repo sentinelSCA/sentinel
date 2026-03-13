@@ -35,3 +35,22 @@ Thumbs.db
 *~
 *.swp
 *.swo
+
+# runtime / workspace artifacts
+logs/
+outputs/
+outputs_email/
+outputs_twitter/
+outputs_writer/
+published_email/
+published_twitter/
+approved/
+rejected/
+
+# build artifacts
+wheels/
+*.egg-info/
+
+# disabled configs
+*.disabled
+

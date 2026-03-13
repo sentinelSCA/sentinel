@@ -1,1 +1,0 @@
-Sentinel SCA update: self-healing + dashboard live on VPS. Next: enable live X posting + onboard first validator client.
