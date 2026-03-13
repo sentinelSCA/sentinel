@@ -1,1 +1,0 @@
-SCA test: file mode publish should land on VPS now.
