@@ -92,3 +92,23 @@ wheels/
 # disabled configs
 *.disabled
 
+
+# runtime / workspace artifacts
+logs/
+outputs/
+outputs_email/
+outputs_twitter/
+outputs_writer/
+published_email/
+published_twitter/
+approved/
+rejected/
+
+# build artifacts
+wheels/
+*.egg-info/
+
+# disabled configs
+*.disabled
+
+.venv/\n.venv-sdk/\n_backup/\n*.egg-info/\n.env*\nlogs/\noutputs*/\npublished_*/\napproved/\nrejected/
