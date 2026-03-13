@@ -1,3 +1,0 @@
-SCA v1 LOCKED.
-Scope: blueprint.md (A+B+C only).
-If new features are needed: create a v1.1 or v2 branch—do not expand v1.
