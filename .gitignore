@@ -1,4 +1,4 @@
-# ---------- Python ----------
+# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -6,21 +6,26 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-.venv*
+.venv*/
 venv/
 
-# ---------- Environment / secrets ----------
+# Secrets
 .env
 .env.*
 !.env.example
 
-# ---------- Runtime state ----------
+# Runtime artifacts
+logs/
+outputs*/
+published_*/
+approved/
+rejected/
 agents.json
 audit/
-logs/
 sentinel.db
 
-# ---------- Backups / scratch ----------
+# Backups / scratch
+_backup/
 *.bak
 *.bak.*
 *.backup
@@ -29,86 +34,12 @@ sentinel.db
 *.disabled
 compose.yml.bad
 
-# ---------- OS / editor junk ----------
+# Build artifacts
+wheels/
+
+# OS / editor
 .DS_Store
 Thumbs.db
 *~
 *.swp
 *.swo
-
-# runtime / workspace artifacts
-logs/
-outputs/
-outputs_email/
-outputs_twitter/
-outputs_writer/
-published_email/
-published_twitter/
-approved/
-rejected/
-
-# build artifacts
-wheels/
-*.egg-info/
-
-# disabled configs
-*.disabled
-
-
-# runtime / workspace artifacts
-logs/
-outputs/
-outputs_email/
-outputs_twitter/
-outputs_writer/
-published_email/
-published_twitter/
-approved/
-rejected/
-
-# build artifacts
-wheels/
-*.egg-info/
-
-# disabled configs
-*.disabled
-
-
-# runtime / workspace artifacts
-logs/
-outputs/
-outputs_email/
-outputs_twitter/
-outputs_writer/
-published_email/
-published_twitter/
-approved/
-rejected/
-
-# build artifacts
-wheels/
-*.egg-info/
-
-# disabled configs
-*.disabled
-
-
-# runtime / workspace artifacts
-logs/
-outputs/
-outputs_email/
-outputs_twitter/
-outputs_writer/
-published_email/
-published_twitter/
-approved/
-rejected/
-
-# build artifacts
-wheels/
-*.egg-info/
-
-# disabled configs
-*.disabled
-
-.venv/\n.venv-sdk/\n_backup/\n*.egg-info/\n.env*\nlogs/\noutputs*/\npublished_*/\napproved/\nrejected/
