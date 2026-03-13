@@ -112,6 +112,13 @@ def load_agents() -> dict:
     except Exception:
         return {}
 
+def live_agent_count() -> int:
+    try:
+        from agent_identity import list_agents
+        return len(list_agents())
+    except Exception:
+        return len(load_agents())
+
 
 def save_agents(agents: dict):
     with open(AGENTS_FILE, "w") as f:
@@ -298,7 +305,7 @@ def render_agents_panel() -> str:
         <tr>
           <td><code>{html.escape(str(agent_id))}</code></td>
           <td>{html.escape(str(name))}</td>
-          <td>{html.escape(str(status))}</td>
+          <td><span class="pill {html.escape(str(status))}">{html.escape(str(status))}</span></td>
           <td>{html.escape(str(role))}</td>
           <td>{html.escape(str(reputation))}</td>
           <td>{html.escape(str(allowed))}</td>
@@ -343,16 +350,28 @@ def dashboard():
     approved_items = lrange_safe(APPROVED_Q, -5, -1)
     rejected_items = lrange_safe(REJECTED_Q, -5, -1)
     executed_items = lrange_safe(EXECUTED_Q, -5, -1)
+    approved_count = qlen(APPROVED_Q)
+    rejected_count = qlen(REJECTED_Q)
+    executed_count = qlen(EXECUTED_Q)
+    needs_human_count = qlen(NEEDS_HUMAN_Q)
 
     html = templates.get_template("dashboard.html").render(
-        telemetry_panel=render_telemetry_panel(),
-        needs_human_panel=render_needs_human(needs_human_items),
-        approved_panel=render_cards("Approved Actions (latest 5)", approved_items),
-        rejected_panel=render_cards("Rejected Actions (latest 5)", rejected_items),
-        executed_panel=render_cards("Executed Actions (latest 5)", executed_items),
-        timeline_panel=render_timeline(),
-        agents_panel=render_agents_panel(),
-    )
+    telemetry_panel=render_telemetry_panel(),
+    needs_human_panel=render_needs_human(needs_human_items),
+    approved_panel=render_cards("Approved Actions (latest 5)", approved_items),
+    rejected_panel=render_cards("Rejected Actions (latest 5)", rejected_items),
+    executed_panel=render_cards("Executed Actions (latest 5)", executed_items),
+    timeline_panel=render_timeline(),
+    agents_panel=render_agents_panel(),
+    agents_count=live_agent_count(),
+    needs_human_count=needs_human_count,
+    approved_count=approved_count,
+    executed_count=executed_count,
+    rejected_count=rejected_count,
+    freeze_enabled=bool(getattr(__import__("sentinel_api"), "GLOBAL_FREEZE", False)),
+    freeze_label="Freeze On" if bool(getattr(__import__("sentinel_api"), "GLOBAL_FREEZE", False)) else "Freeze Off",
+    freeze_badge_class="bad" if bool(getattr(__import__("sentinel_api"), "GLOBAL_FREEZE", False)) else "good",
+)
 
     return Response(content=html, media_type="text/html")
 def render_public_homepage() -> str:

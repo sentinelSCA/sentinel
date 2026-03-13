@@ -79,6 +79,9 @@ POLICY_VERSION = os.getenv("SENTINEL_POLICY_VERSION", "v2")
 # HARDENING KNOBS
 STRICT_MODE = os.getenv("SENTINEL_STRICT_MODE", "0").strip() == "1"
 GLOBAL_FREEZE = os.getenv("SENTINEL_GLOBAL_FREEZE", "0").strip() == "1"
+POLICY_MODE = os.getenv("SENTINEL_POLICY_MODE", "enforce").strip().lower()
+if POLICY_MODE not in {"monitor", "review", "enforce"}:
+    POLICY_MODE = "enforce"
 
 # Security
 API_KEY = os.getenv("SENTINEL_API_KEY", "").strip()
@@ -702,6 +705,58 @@ def system_status():
             "redis": "error",
             "error": str(e),
       }
+
+# ----------------------------
+# Route: simulate
+# ----------------------------
+@app.post("/api/v2/simulate")
+def simulate(req: AnalyzeRequest):
+    validated_command = parse_and_validate_command(req.command)
+
+    decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
+
+    rep_score_before = get_rep(req.agent_id)
+    if decision == "allow":
+        if rep_score_before < REP_AUTO_DENY:
+            decision = "deny"
+            risk = "high"
+            score = max(float(score), 0.95)
+            reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_DENY:.2f}"
+        elif rep_score_before < REP_AUTO_REVIEW:
+            decision = "review"
+            risk = "medium"
+            score = max(float(score), 0.65)
+            reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_REVIEW:.2f}"
+
+# Policy mode routing
+    if POLICY_MODE == "monitor":
+        vt = variable_timestamp(req.command, req.timestamp, req.agent_id)
+        body = {
+            "timestamp": req.timestamp,
+            "agent_id": req.agent_id,
+            "command": validated_command,
+            "decision": decision,
+            "risk": risk,
+            "reason": f"[monitor mode] {reason}",
+            "risk_score": score,
+            "policy_version": POLICY_VERSION,
+            "vt": vt,
+            "reputation_before": rep_before,
+            "reputation_after": rep_before,
+            "signature": hashlib.sha256(
+                f"{req.agent_id}|{req.command}|{decision}|{vt}".encode()
+            ).hexdigest(),
+            "policy_mode": POLICY_MODE,
+            "simulation": False,
+            "enforced": False,
+        }
+        return body
+
+    if POLICY_MODE == "review" and decision == "allow":
+        decision = "review"
+        risk = "medium"
+        score = max(score, 0.65)
+        reason = f"[review mode] Auto-review instead of allow: {reason}"
 
 # ----------------------------
 # Route: analyze (main)

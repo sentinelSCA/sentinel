@@ -1,26 +1,37 @@
-# Python
+# ---------- Python ----------
 __pycache__/
 *.pyc
-
-# Runtime state
-agents.json
-audit/
-logs/
-
-# Backups
-*.bak*
-*.backup
-
-# Local env
-.env
-
-# OS junk
-.DS_Store
-
-# Python build artifacts
+*.pyo
+*.pyd
 *.egg-info/
 dist/
 build/
-__pycache__/
-*.pyc
 .venv*
+venv/
+
+# ---------- Environment / secrets ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Runtime state ----------
+agents.json
+audit/
+logs/
+sentinel.db
+
+# ---------- Backups / scratch ----------
+*.bak
+*.bak.*
+*.backup
+*.bundle
+*.broken.*
+*.disabled
+compose.yml.bad
+
+# ---------- OS / editor junk ----------
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
