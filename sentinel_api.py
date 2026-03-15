@@ -91,6 +91,25 @@ TIME_WINDOW_SEC = int(os.getenv("SENTINEL_TIME_WINDOW_SEC", "120").strip() or "1
 # Redis replay protection (primary)
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0").strip()
 REPLAY_PREFIX = os.getenv("SENTINEL_REPLAY_PREFIX", "sentinel:replay").strip()
+FREEZE_KEY = "sentinel:global_freeze"
+
+def get_global_freeze() -> bool:
+    try:
+        r = get_queue_redis()
+        raw = r.get(FREEZE_KEY)
+        if raw is None:
+            return GLOBAL_FREEZE
+        return str(raw).strip().lower() in {"1", "true", "on", "yes"}
+    except Exception:
+        return GLOBAL_FREEZE
+
+def set_global_freeze(enabled: bool) -> bool:
+    try:
+        r = get_queue_redis()
+        r.set(FREEZE_KEY, "1" if enabled else "0")
+        return enabled
+    except Exception:
+        return GLOBAL_FREEZE
 
 # Rate limiting (per agent)
 RATE_LIMIT_MAX = int(os.getenv("SENTINEL_RATE_LIMIT_MAX", "30").strip() or "30")
@@ -409,7 +428,7 @@ def health():
         "status": "ok",
         "policy_version": POLICY_VERSION,
         "strict_mode": STRICT_MODE,
-        "global_freeze": GLOBAL_FREEZE,
+        "global_freeze": get_global_freeze(),
         "replay_backend": "redis" if _redis_ok else "sqlite",
     }
 
@@ -707,10 +726,11 @@ def system_status():
       }
 
 # ----------------------------
-# Route: simulate
+# Route: simulate (policy evaluation only)
 # ----------------------------
 @app.post("/api/v2/simulate")
 def simulate(req: AnalyzeRequest):
+
     validated_command = parse_and_validate_command(req.command)
 
     decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
@@ -728,35 +748,18 @@ def simulate(req: AnalyzeRequest):
             score = max(float(score), 0.65)
             reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_REVIEW:.2f}"
 
-# Policy mode routing
-    if POLICY_MODE == "monitor":
-        vt = variable_timestamp(req.command, req.timestamp, req.agent_id)
-        body = {
-            "timestamp": req.timestamp,
-            "agent_id": req.agent_id,
-            "command": validated_command,
-            "decision": decision,
-            "risk": risk,
-            "reason": f"[monitor mode] {reason}",
-            "risk_score": score,
-            "policy_version": POLICY_VERSION,
-            "vt": vt,
-            "reputation_before": rep_before,
-            "reputation_after": rep_before,
-            "signature": hashlib.sha256(
-                f"{req.agent_id}|{req.command}|{decision}|{vt}".encode()
-            ).hexdigest(),
-            "policy_mode": POLICY_MODE,
-            "simulation": False,
-            "enforced": False,
-        }
-        return body
-
-    if POLICY_MODE == "review" and decision == "allow":
-        decision = "review"
-        risk = "medium"
-        score = max(score, 0.65)
-        reason = f"[review mode] Auto-review instead of allow: {reason}"
+    return {
+        "simulation": True,
+        "agent_id": req.agent_id,
+        "command": validated_command,
+        "decision": str(decision),
+        "risk": str(risk),
+        "risk_score": float(score),
+        "reason": str(reason),
+        "policy_version": POLICY_VERSION,
+        "reputation_input": float(req.reputation),
+        "rep_score_before": float(rep_score_before),
+    }
 
 # ----------------------------
 # Route: analyze (main)
@@ -776,7 +779,7 @@ def analyze(
     agents_seen.add(req.agent_id)
     _m_agents_seen_update()
 
-    if GLOBAL_FREEZE:
+    if get_global_freeze():
         _m_inc("http_503_total")
         raise HTTPException(status_code=503, detail="Global freeze enabled")
 
@@ -891,7 +894,7 @@ def analyze(
 
             r = get_queue_redis()
             record_key = f"ops:actions:record:{action_id}"
-            r.setex(record_key, 900, json.dumps(msg, separators=(",", ":")))
+            r.setex(record_key, 86400, json.dumps(msg, separators=(",", ":")))
             r.rpush(OPS_PROPOSED_Q, action_id)
 
             print("ENQUEUE_REVIEW ok:", action_id, flush=True)

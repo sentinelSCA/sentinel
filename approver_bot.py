@@ -113,6 +113,7 @@ def approve(action_id: str, rec: dict, computed_digest: str):
 
 def needs_human(action_id: str, rec: dict):
     rec["status"] = "needs_human_approval"
+    rec["expires_ts"] = now_ts() + 86400 * 7
     save_record(action_id, rec)
     r.rpush(HUMAN_Q, action_id)
     print("needs human approval:", action_id, flush=True)
@@ -134,8 +135,10 @@ def run():
             action_id = item.strip()
             raw = r.get(record_key(action_id))
             if not raw:
-                reject(action_id, "missing_action_record")
+                print(f"record missing for {action_id}, requeueing", flush=True)
                 r.lrem(INFLIGHT_Q, 1, action_id)
+                r.rpush(PROPOSED_Q, action_id)
+                time.sleep(0.25)
                 continue
 
             rec = jload(raw)
