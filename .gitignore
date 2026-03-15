@@ -63,3 +63,4 @@ wheels/
 # disabled configs
 *.disabled
 
+capabilities.json

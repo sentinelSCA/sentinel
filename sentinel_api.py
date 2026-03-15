@@ -1,3 +1,12 @@
+from sentinel_scoring import compute_agent_security_scores
+from sentinel_replay import replay_event
+from sentinel_timeline import build_timeline_event, append_timeline_event
+from sentinel_ledger import append_report
+from sentinel_report import build_action_report
+from sentinel_hashing import deterministic_action_hash
+from sentinel_limits import check_behavior_limits, record_behavior_event
+from sentinel_schema import validate_action_schema
+from sentinel_capabilities import has_capability
 import time
 import hmac
 import hashlib
@@ -732,8 +741,54 @@ def system_status():
 def simulate(req: AnalyzeRequest):
 
     validated_command = parse_and_validate_command(req.command)
+    validated_command = validate_action_schema(validated_command)
+    action_hash = deterministic_action_hash(req.agent_id, validated_command)
 
-    decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
+    capability = ""
+    if isinstance(validated_command, dict):
+        action_type = str(validated_command.get("type", "")).strip()
+        target = str(validated_command.get("target", "")).strip()
+        if action_type and target:
+            capability = f"{action_type}:{target}"
+        elif action_type:
+            capability = action_type
+
+    action_type_for_limits = ""
+    if isinstance(validated_command, dict):
+        action_type_for_limits = str(validated_command.get("type", "")).strip()
+
+    if capability and not has_capability(req.agent_id, capability):
+        decision = "deny"
+        risk = "high"
+        score = 0.95
+        reason = f"Capability not granted: {capability}"
+    else:
+        ok_limits, limit_reason = check_behavior_limits(req.agent_id, action_type_for_limits)
+        if not ok_limits:
+            decision = "deny"
+            risk = "high"
+            score = 0.95
+            reason = limit_reason
+        else:
+            decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
+            record_behavior_event(req.agent_id, action_type_for_limits)
+
+    identity = "ed25519:registered-agent"
+    report = build_action_report(
+        agent_id=req.agent_id,
+        identity=identity,
+        capability=capability,
+        action=validated_command,
+        decision=str(decision),
+        policy_version=POLICY_VERSION,
+        risk_score=float(score),
+        reason=str(reason),
+        action_hash=action_hash,
+    )
+    ledger_row = append_report(report)
+
+    timeline_event = build_timeline_event(report, ledger_row["ledger_hash"])
+    append_timeline_event(timeline_event)
 
     rep_score_before = get_rep(req.agent_id)
     if decision == "allow":
@@ -752,6 +807,9 @@ def simulate(req: AnalyzeRequest):
         "simulation": True,
         "agent_id": req.agent_id,
         "command": validated_command,
+        "action_hash": action_hash,
+        "action_report": report,
+        "ledger_hash": ledger_row["ledger_hash"],
         "decision": str(decision),
         "risk": str(risk),
         "risk_score": float(score),
@@ -831,13 +889,36 @@ def analyze(
             raise HTTPException(status_code=401, detail="Bad signature")
 
     validated_command = parse_and_validate_command(req.command)
+    validated_command = validate_action_schema(validated_command)
+    action_hash = deterministic_action_hash(req.agent_id, validated_command)
+
+    capability = ""
+    if isinstance(validated_command, dict):
+        action_type = str(validated_command.get("type", "")).strip()
+        target = str(validated_command.get("target", "")).strip()
+        if action_type and target:
+            capability = f"{action_type}:{target}"
+        elif action_type:
+            capability = action_type
+
+    action_type_for_limits = ""
+    if isinstance(validated_command, dict):
+        action_type_for_limits = str(validated_command.get("type", "")).strip()
 
     # Legacy local reputation state
     db = load_reputation_db()
     rep_before = get_state(db, req.agent_id).copy()
 
     # Policy decision
-    decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
+    if capability and not has_capability(req.agent_id, capability):
+        decision, risk, score, reason = "deny", "high", 0.95, f"Capability not granted: {capability}"
+    else:
+        ok_limits, limit_reason = check_behavior_limits(req.agent_id, action_type_for_limits)
+        if not ok_limits:
+            decision, risk, score, reason = "deny", "high", 0.95, limit_reason
+        else:
+            decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
+            record_behavior_event(req.agent_id, action_type_for_limits)
     decision = str(decision)
     risk = str(risk)
     score = float(score)
@@ -931,6 +1012,7 @@ def analyze(
         "timestamp": req.timestamp,
         "agent_id": req.agent_id,
         "command": req.command,
+        "action_hash": action_hash,
         "decision": decision,
         "risk": risk,
         "reason": reason,
@@ -1011,3 +1093,17 @@ def telemetry():
             "rejected": safe_len("ops:actions:rejected"),
         },
     }
+
+# ----------------------------
+# Route: replay / forensics
+# ----------------------------
+@app.get("/api/v2/replay/{event_id}")
+def replay_route(event_id: str):
+    return replay_event(event_id)
+
+# ----------------------------
+# Route: security scoring
+# ----------------------------
+@app.get("/api/v2/security-score")
+def security_score(limit: int = 200):
+    return compute_agent_security_scores(limit=limit)
