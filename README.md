@@ -159,3 +159,54 @@ See SECURITY.md for responsible disclosure.
 # License
 
 MIT License
+
+---
+
+## Quick Start (60 seconds)
+
+Clone the repository:
+
+    git clone https://github.com/sentinelSCA/sentinel.git
+    cd sentinel
+
+Start Sentinel:
+
+    docker compose up -d
+
+Open the dashboard:
+
+    http://localhost:8001/dashboard
+
+Send a test request:
+
+    curl http://localhost:8001/api/v2/security-score
+
+You now have Sentinel running locally.
+
+---
+
+## Founding Developer Program
+
+Sentinel is inviting a small number of developers to participate in the **Sentinel Founding Developer Program**.
+
+Participants receive:
+
+• Free access to the Sentinel platform  
+• Early access to new features  
+• Direct communication with the founder  
+• Opportunity to influence the roadmap  
+
+We are looking for developers working with:
+
+• AI agents  
+• DevOps automation  
+• infrastructure bots  
+• autonomous workflows  
+
+Participants will test Sentinel with real workflows and provide feedback.
+
+If you are interested:
+
+contact@sentinelsca.com
+
+---
