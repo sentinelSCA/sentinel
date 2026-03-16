@@ -185,6 +185,30 @@ You now have Sentinel running locally.
 
 ---
 
+
+## Example Workflow
+
+An AI agent attempts a high-impact action:
+
+    restart_service(redis)
+
+Sentinel evaluates the request through its governance pipeline:
+
+- Agent identity verified
+- Policy decision: REVIEW
+- Action recorded in a tamper-evident ledger
+- Replay available for forensics
+
+Example API response:
+
+    {
+      "decision": "review",
+      "risk": "high",
+      "risk_score": 0.90
+    }
+
+---
+
 ## Founding Developer Program
 
 Sentinel is inviting a small number of developers to participate in the **Sentinel Founding Developer Program**.
