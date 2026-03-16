@@ -1,3 +1,6 @@
+from sentinel_contact import save_contact_request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from sentinel_scoring import compute_agent_security_scores
 from sentinel_replay import replay_event
 from sentinel_timeline import build_timeline_event, append_timeline_event
@@ -28,7 +31,7 @@ from agent_identity import get_agent
 import base64
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import Form, FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 from ops_digest import digest_action
 import json
@@ -249,6 +252,8 @@ def send_telegram_alert(message: str) -> None:
 app = FastAPI(title=APP_NAME, version=POLICY_VERSION)
 
 
+templates = Jinja2Templates(directory="templates")
+
 # ----------------------------
 # In-memory rate limiter
 # ----------------------------
@@ -427,6 +432,59 @@ class RevokeAgentReq(BaseModel):
     agent_id: str
     reason: str = ""
 
+# ----------------------------
+# Route: contact page
+# ----------------------------
+@app.get("/contact", response_class=HTMLResponse)
+def contact_page(request: Request):
+    return templates.TemplateResponse("contact.html", {
+        "request": request,
+        "success": False,
+        "error": "",
+        "form_data": None,
+    })
+
+@app.post("/contact", response_class=HTMLResponse)
+def contact_submit(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    company: str = Form(""),
+    use_case: str = Form(""),
+    message: str = Form(...),
+):
+    form_data = {
+        "name": name,
+        "email": email,
+        "company": company,
+        "use_case": use_case,
+        "message": message,
+    }
+
+    if "@" not in email:
+        return templates.TemplateResponse("contact.html", {
+            "request": request,
+            "success": False,
+            "error": "Please enter a valid email address.",
+            "form_data": form_data,
+        })
+
+    if not name.strip() or not message.strip():
+        return templates.TemplateResponse("contact.html", {
+            "request": request,
+            "success": False,
+            "error": "Name and message are required.",
+            "form_data": form_data,
+        })
+
+    save_contact_request(form_data)
+
+    return templates.TemplateResponse("contact.html", {
+        "request": request,
+        "success": True,
+        "error": "",
+        "form_data": None,
+    })
 
 # ----------------------------
 # Routes: health/metrics/stats
@@ -1107,3 +1165,10 @@ def replay_route(event_id: str):
 @app.get("/api/v2/security-score")
 def security_score(limit: int = 200):
     return compute_agent_security_scores(limit=limit)
+
+# ----------------------------
+# Route: pricing
+# ----------------------------
+@app.get("/pricing", response_class=HTMLResponse)
+def pricing_page(request: Request):
+    return templates.TemplateResponse("pricing.html", {"request": request})

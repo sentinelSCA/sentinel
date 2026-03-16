@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Sentinel SCA</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Epilogue:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+body{
+  background:#060810;
+  color:#dde4f0;
+  font-family:'Epilogue',sans-serif;
+  margin:0;
+}
+.container{
+  max-width:900px;
+  margin:72px auto;
+  padding:20px;
+}
+.top{
+  text-align:center;
+  margin-bottom:32px;
+}
+h1{
+  font-size:44px;
+  margin-bottom:12px;
+}
+p{
+  color:#8a96aa;
+  line-height:1.6;
+}
+.card{
+  background:#0a0d14;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;
+  padding:32px;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media (max-width:700px){
+  .form-grid{grid-template-columns:1fr;}
+}
+label{
+  display:block;
+  font-size:13px;
+  margin-bottom:8px;
+  color:#dde4f0;
+  font-weight:600;
+}
+input, textarea{
+  width:100%;
+  background:#060810;
+  color:#dde4f0;
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:8px;
+  padding:12px 14px;
+  font:inherit;
+}
+textarea{
+  min-height:140px;
+  resize:vertical;
+}
+.full{
+  grid-column:1 / -1;
+}
+.actions{
+  margin-top:20px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+button, .mail-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px 24px;
+  border-radius:8px;
+  font-weight:700;
+  text-decoration:none;
+}
+button{
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#00c8ff,#0055ff);
+  color:#000;
+}
+.mail-link{
+  border:1px solid rgba(255,255,255,0.12);
+  color:#dde4f0;
+}
+.notice{
+  margin-top:18px;
+  padding:14px 16px;
+  border-radius:8px;
+  font-size:14px;
+}
+.notice.ok{
+  background:rgba(0,224,122,0.08);
+  border:1px solid rgba(0,224,122,0.20);
+  color:#bff5d7;
+}
+.notice.err{
+  background:rgba(255,58,90,0.08);
+  border:1px solid rgba(255,58,90,0.20);
+  color:#ffc7d2;
+}
+.mono{
+  font-family:'IBM Plex Mono',monospace;
+  color:#8a96aa;
+  font-size:12px;
+  margin-top:18px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top">
+    <h1>Contact Sentinel</h1>
+    <p>Talk to us about Startup, Business, or Enterprise deployment. Use the form below and we’ll have your details captured for follow-up.</p>
+  </div>
+
+  <div class="card">
+    {% if success %}
+      <div class="notice ok">Thanks — your request was received successfully.</div>
+    {% endif %}
+    {% if error %}
+      <div class="notice err">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/contact">
+      <div class="form-grid">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" name="name" required value="{{ form_data.name if form_data else '' }}">
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required value="{{ form_data.email if form_data else '' }}">
+        </div>
+
+        <div>
+          <label for="company">Company</label>
+          <input id="company" name="company" value="{{ form_data.company if form_data else '' }}">
+        </div>
+
+        <div>
+          <label for="use_case">Use case</label>
+          <input id="use_case" name="use_case" placeholder="DevOps agents, enterprise copilots, trading bots..." value="{{ form_data.use_case if form_data else '' }}">
+        </div>
+
+        <div class="full">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required>{{ form_data.message if form_data else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Send Request</button>
+        <a class="mail-link" href="mailto:contact@sentinelsca.com">Use Email Instead</a>
+      </div>
+    </form>
+
+    <div class="mono">Direct email: contact@sentinelsca.com</div>
+  </div>
+</div>
+</body>
+</html>

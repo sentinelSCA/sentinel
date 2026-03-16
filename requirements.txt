@@ -24,3 +24,4 @@ cryptography==42.0.8
 requests-oauthlib
 requests
 jinja2>=3.1
+python-multipart

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel SCA — Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Epilogue:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060810;
+      --bg2: #0a0d14;
+      --bg3: #0f1420;
+      --bg4: #141a24;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.12);
+      --text: #dde4f0;
+      --muted: #5a6478;
+      --muted2: #8a96aa;
+      --accent: #00c8ff;
+      --accent2: #0055ff;
+      --green: #00e07a;
+      --gold: #f0a020;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'Epilogue', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,85,255,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0,200,255,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6,8,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.08em;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(0,200,255,0.4);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,200,255,0.06);
+    }
+
+    .logo-mark::before {
+      content: '⬡';
+      color: var(--accent);
+      font-size: 14px;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      padding: 90px 0 56px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(0,200,255,0.18);
+      background: rgba(0,200,255,0.04);
+      border-radius: 100px;
+      padding: 5px 14px 5px 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: blink 2s ease infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 5.5vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted2);
+      max-width: 620px;
+      margin: 0 auto 44px;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 56px;
+    }
+
+    .toggle-track {
+      display: flex;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      padding: 4px;
+      gap: 2px;
+    }
+
+    .toggle-btn {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 7px 18px;
+      border-radius: 100px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      letter-spacing: 0.02em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-btn.active {
+      background: var(--bg4);
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    .save-pill {
+      background: rgba(0,224,122,0.12);
+      color: var(--green);
+      border: 1px solid rgba(0,224,122,0.25);
+      border-radius: 100px;
+      padding: 1px 8px;
+      font-size: 10px;
+      font-family: var(--mono);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .layer-strip {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 56px;
+      overflow-x: auto;
+    }
+
+    .layer-strip-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .layers-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      min-width: max-content;
+    }
+
+    .layer-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .layer-num {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .layer-pill {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted2);
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+    }
+
+    .layer-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,200,255,0.04);
+    }
+
+    .layer-pill.new-layer {
+      border-color: rgba(0,224,122,0.3);
+      color: var(--green);
+      background: rgba(0,224,122,0.04);
+    }
+
+    .layer-arrow {
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border2), rgba(0,200,255,0.3), var(--border2));
+      flex-shrink: 0;
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .layer-arrow::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: -3px;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid rgba(0,200,255,0.4);
+      border-top: 1px solid rgba(0,200,255,0.4);
+      transform: rotate(45deg);
+    }
+
+    .new-badge {
+      color: var(--green);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 56px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 580px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    .plan {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .plan::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    }
+
+    .plan:hover {
+      transform: translateY(-5px);
+      border-color: var(--border2);
+    }
+
+    .plan.featured {
+      border-color: rgba(0,200,255,0.3);
+      background: linear-gradient(160deg, rgba(0,55,120,0.15) 0%, var(--bg2) 55%);
+    }
+
+    .plan.featured::before {
+      background: linear-gradient(90deg, transparent, rgba(0,200,255,0.5), transparent);
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--accent);
+      color: #000;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 100px;
+    }
+
+    .plan-tier-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .plan.featured .plan-tier-label { color: var(--accent); }
+
+    .plan-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .plan-target {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      min-height: 34px;
+    }
+
+    .plan-price-block {
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      margin-bottom: 3px;
+    }
+
+    .price-sym {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted2);
+      padding-top: 4px;
+    }
+
+    .price-val {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      transition: all 0.3s;
+    }
+
+    .price-period {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .price-annual-note {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green);
+      margin-top: 3px;
+      display: none;
+    }
+
+    .price-annual-note.show { display: block; }
+
+    .plan-limits,
+    .plan-features {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .plan-limits {
+      gap: 7px;
+      margin-bottom: 20px;
+    }
+
+    .plan-features {
+      gap: 9px;
+      margin-bottom: 24px;
+    }
+
+    .limit-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted2);
+    }
+
+    .limit-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(0,200,255,0.4);
+      flex-shrink: 0;
+    }
+
+    .feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .feat-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: rgba(0,224,122,0.1);
+      border: 1px solid rgba(0,224,122,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .feat.off {
+      color: var(--muted);
+      opacity: 0.45;
+    }
+
+    .feat.off .feat-icon {
+      background: transparent;
+      border-color: var(--border2);
+      color: var(--muted);
+    }
+
+    .feat.highlight .feat-icon {
+      background: rgba(0,200,255,0.1);
+      border-color: rgba(0,200,255,0.3);
+      color: var(--accent);
+    }
+
+    .feat.highlight { color: var(--accent); }
+
+    .plan-cta,
+    .trial-cta,
+    .btn-a,
+    .btn-b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+      font-weight: 700;
+    }
+
+    .plan-cta {
+      width: 100%;
+      padding: 13px;
+      border-radius: 9px;
+      font-size: 13px;
+      border: none;
+    }
+
+    .cta-ghost {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text);
+    }
+
+    .cta-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cta-solid,
+    .trial-cta,
+    .btn-a {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      color: #000;
+    }
+
+    .cta-solid:hover,
+    .trial-cta:hover,
+    .btn-a:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(0,200,255,0.22);
+    }
+
+    .cta-gold {
+      background: transparent;
+      border: 1px solid rgba(240,160,32,0.35);
+      color: var(--gold);
+    }
+
+    .cta-gold:hover {
+      background: rgba(240,160,32,0.07);
+      border-color: var(--gold);
+    }
+
+    .trial-bar {
+      background: linear-gradient(135deg, rgba(0,55,120,0.2) 0%, rgba(0,200,255,0.05) 100%);
+      border: 1px solid rgba(0,200,255,0.18);
+      border-radius: 12px;
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
+    }
+
+    .trial-left { flex: 1; min-width: 260px; }
+
+    .trial-tag,
+    .section-eyebrow,
+    .payg-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .trial-tag {
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .trial-bar h3 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .trial-bar p {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.55;
+      max-width: 520px;
+    }
+
+    .trial-bar p strong { color: var(--text); }
+
+    .section-head {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-eyebrow {
+      display: inline-block;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      padding: 3px 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      margin-bottom: 10px;
+    }
+
+    .section-head p {
+      font-size: 15px;
+      color: var(--muted2);
+    }
+
+    .addons-grid,
+    .faq-grid {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 56px;
+    }
+
+    .addons-grid { grid-template-columns: repeat(4,1fr); }
+    .faq-grid { grid-template-columns: 1fr 1fr; }
+
+    @media (max-width: 900px) {
+      .addons-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .faq-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .addons-grid { grid-template-columns: 1fr; }
+    }
+
+    .addon,
+    .faq {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      transition: all 0.2s;
+    }
+
+    .addon:hover,
+    .faq:hover {
+      border-color: var(--border2);
+      transform: translateY(-3px);
+    }
+
+    .addon-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(0,200,255,0.05);
+      border: 1px solid rgba(0,200,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+
+    .addon h4,
+    .faq h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .addon p,
+    .faq p {
+      font-size: 12px;
+      color: var(--muted2);
+      line-height: 1.6;
+    }
+
+    .addon-price {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    .faq p code {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 11px;
+      background: rgba(0,200,255,0.07);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .final-cta {
+      background: linear-gradient(135deg, rgba(0,40,100,0.2) 0%, rgba(0,200,255,0.04) 100%);
+      border: 1px solid rgba(0,200,255,0.15);
+      border-radius: 18px;
+      padding: 64px 40px;
+      text-align: center;
+      margin-bottom: 72px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent);
+    }
+
+    .final-cta h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .final-cta p {
+      font-size: 16px;
+      color: var(--muted2);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-a,
+    .btn-b {
+      padding: 14px 28px;
+      border-radius: 9px;
+      font-size: 14px;
+    }
+
+    .btn-b {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    .btn-b:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .foot-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    footer p,
+    .foot-links a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .foot-links {
+      display: flex;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .foot-links a {
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .foot-links a:hover { color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <div class="logo-mark"></div>
+        SENTINEL SCA
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="/docs">Docs</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-eyebrow">Pricing & Plans</div>
+      <h1>Govern every agent.<br><em>At any scale.</em></h1>
+      <p class="hero-sub">13-layer AI agent governance from identity verification to forensic replay. Built for developers. Designed for enterprise governance.</p>
+
+      <div class="toggle-wrap">
+        <div class="toggle-track">
+          <button class="toggle-btn active" onclick="setBilling('monthly', this)">Monthly</button>
+          <button class="toggle-btn" onclick="setBilling('annual', this)">
+            Annual <span class="save-pill">2 MONTHS FREE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer-strip">
+      <div class="layer-strip-label">13-Layer Governance Framework</div>
+      <div class="layers-row">
+        <div class="layer-node"><div class="layer-num">01</div><div class="layer-pill">Agent Identity</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">02</div><div class="layer-pill">Capability Tokens</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">03</div><div class="layer-pill">Schema Validation</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">04</div><div class="layer-pill">Behavior Limits</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">05</div><div class="layer-pill">Policy Engine</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">06</div><div class="layer-pill">Action Hash</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">07</div><div class="layer-pill">Execution Worker</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">08</div><div class="layer-pill new-layer">AI Action Report</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">09</div><div class="layer-pill">Audit Log</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">10</div><div class="layer-pill new-layer">Execution Ledger</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">11</div><div class="layer-pill new-layer">Live Timeline</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">12</div><div class="layer-pill new-layer">Replay & Forensics</div></div>
+        <div class="layer-arrow"></div>
+        <div class="layer-node"><div class="layer-num">13</div><div class="layer-pill new-layer">Security Scoring</div></div>
+      </div>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-tier-label">Tier 01</div>
+        <div class="plan-name">Developer</div>
+        <div class="plan-target">Individual builders evaluating Sentinel in sandbox and non-production environments.</div>
+        <div class="plan-price-block">
+          <div class="price-row">
+            <div class="price-val">Free</div>
+          </div>
+          <div class="price-period">No card required · Always free</div>
+        </div>
+        <div class="plan-limits">
+          <div class="limit-row"><div class="limit-dot"></div>1 agent</div>
+          <div class="limit-row"><div class="limit-dot"></div>1,000 requests / month</div>
+          <div class="limit-row"><div class="limit-dot"></div>7-day retention</div>
+          <div class="limit-row"><div class="limit-dot"></div>Layers 1–6 only</div>
+        </div>
+        <div class="plan-features">
+          <div class="feat"><div class="feat-icon">✓</div>Agent identity (Ed25519)</div>
+          <div class="feat"><div class="feat-icon">✓</div>Capability tokens</div>
+          <div class="feat"><div class="feat-icon">✓</div>Schema validation</div>
+          <div class="feat"><div class="feat-icon">✓</div>Behavior limits</div>
+          <div class="feat"><div class="feat-icon">✓</div>Policy engine</div>
+          <div class="feat"><div class="feat-icon">✓</div>Deterministic action hash</div>
+          <div class="feat off"><div class="feat-icon">—</div>Execution worker</div>
+          <div class="feat off"><div class="feat-icon">—</div>Action reports</div>
+          <div class="feat off"><div class="feat-icon">—</div>Ledger and timeline</div>
+          <div class="feat off"><div class="feat-icon">—</div>Replay & forensics</div>
+        </div>
+        <a href="/dashboard" class="plan-cta cta-ghost">Start Free</a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-tier-label">Tier 02</div>
+        <div class="plan-name">Startup</div>
+        <div class="plan-target">Early production teams deploying AI agents on live infrastructure.</div>
+        <div class="plan-price-block">
+          <div class="price-row">
+            <div class="price-sym">$</div>
+            <div class="price-val" data-m="199" data-a="166">199</div>
+          </div>
+          <div class="price-period">per month · billed monthly</div>
+          <div class="price-annual-note" id="an-startup">$1,990/year — 2 months free</div>
+        </div>
+        <div class="plan-limits">
+          <div class="limit-row"><div class="limit-dot"></div>Up to 10 agents</div>
+          <div class="limit-row"><div class="limit-dot"></div>100,000 requests / month</div>
+          <div class="limit-row"><div class="limit-dot"></div>90-day retention</div>
+          <div class="limit-row"><div class="limit-dot"></div>Layers 1–9</div>
+        </div>
+        <div class="plan-features">
+          <div class="feat"><div class="feat-icon">✓</div>Everything in Developer</div>
+          <div class="feat"><div class="feat-icon">✓</div>Execution worker</div>
+          <div class="feat"><div class="feat-icon">✓</div>Human approval workflow</div>
+          <div class="feat"><div class="feat-icon">✓</div>AI Action Report</div>
+          <div class="feat"><div class="feat-icon">✓</div>Hash-chained audit log</div>
+          <div class="feat"><div class="feat-icon">✓</div>Basic live timeline</div>
+          <div class="feat"><div class="feat-icon">✓</div>Email support</div>
+          <div class="feat off"><div class="feat-icon">—</div>Replay & forensics</div>
+          <div class="feat off"><div class="feat-icon">—</div>Security scoring dashboard</div>
+          <div class="feat off"><div class="feat-icon">—</div>SSO / SAML</div>
+        </div>
+        <a href="/contact" class="plan-cta cta-ghost">Start with Startup</a>
+      </div>
+
+      <div class="plan featured">
+        <div class="plan-badge">MOST POPULAR</div>
+        <div class="plan-tier-label">Tier 03</div>
+        <div class="plan-name">Business</div>
+        <div class="plan-target">Full governance, ledger, timeline, replay, and incident investigation.</div>
+        <div class="plan-price-block">
+          <div class="price-row">
+            <div class="price-sym">$</div>
+            <div class="price-val" data-m="999" data-a="832">999</div>
+          </div>
+          <div class="price-period">per month · billed monthly</div>
+          <div class="price-annual-note" id="an-business">$9,990/year — 2 months free</div>
+        </div>
+        <div class="plan-limits">
+          <div class="limit-row"><div class="limit-dot"></div>Up to 50 agents</div>
+          <div class="limit-row"><div class="limit-dot"></div>500,000 requests / month</div>
+          <div class="limit-row"><div class="limit-dot"></div>1-year retention</div>
+          <div class="limit-row"><div class="limit-dot"></div>All 13 layers</div>
+        </div>
+        <div class="plan-features">
+          <div class="feat"><div class="feat-icon">✓</div>Everything in Startup</div>
+          <div class="feat highlight"><div class="feat-icon">✓</div>Deterministic execution ledger</div>
+          <div class="feat highlight"><div class="feat-icon">✓</div>Full live action timeline</div>
+          <div class="feat highlight"><div class="feat-icon">✓</div>Replay & forensics</div>
+          <div class="feat"><div class="feat-icon">✓</div>AI security scoring</div>
+          <div class="feat"><div class="feat-icon">✓</div>Webhook notifications</div>
+          <div class="feat"><div class="feat-icon">✓</div>Advanced capability controls</div>
+          <div class="feat"><div class="feat-icon">✓</div>Priority support</div>
+          <div class="feat"><div class="feat-icon">✓</div>Full API access</div>
+          <div class="feat off"><div class="feat-icon">—</div>SSO / SAML</div>
+        </div>
+        <a href="/contact" class="plan-cta cta-solid">Start 14-Day Trial →</a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-tier-label">Tier 04</div>
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-target">Regulated industries requiring compliance, private deployment, and custom controls.</div>
+        <div class="plan-price-block">
+          <div class="price-row">
+            <div class="price-val" style="font-size:28px;padding-top:10px;">Custom</div>
+          </div>
+          <div class="price-period">$5,000 – $15,000 / month</div>
+          <div class="price-annual-note show">$50,000 – $150,000 / year</div>
+        </div>
+        <div class="plan-limits">
+          <div class="limit-row"><div class="limit-dot"></div>Unlimited agents</div>
+          <div class="limit-row"><div class="limit-dot"></div>Unlimited requests</div>
+          <div class="limit-row"><div class="limit-dot"></div>Custom retention</div>
+          <div class="limit-row"><div class="limit-dot"></div>All 13 layers + enterprise controls</div>
+        </div>
+        <div class="plan-features">
+          <div class="feat"><div class="feat-icon">✓</div>Everything in Business</div>
+          <div class="feat"><div class="feat-icon">✓</div>SSO / SAML</div>
+          <div class="feat"><div class="feat-icon">✓</div>SIEM / SOAR integrations</div>
+          <div class="feat"><div class="feat-icon">✓</div>Private VPC / on-prem</div>
+          <div class="feat"><div class="feat-icon">✓</div>Compliance reporting suite</div>
+          <div class="feat"><div class="feat-icon">✓</div>Custom policy packs</div>
+          <div class="feat"><div class="feat-icon">✓</div>Hardware-backed identity options</div>
+          <div class="feat"><div class="feat-icon">✓</div>Dedicated support and SLA</div>
+          <div class="feat"><div class="feat-icon">✓</div>Multi-region support</div>
+          <div class="feat"><div class="feat-icon">✓</div>Security architecture review</div>
+        </div>
+        <a href="/contact" class="plan-cta cta-gold">Talk to Sales →</a>
+      </div>
+    </div>
+
+    <div class="trial-bar">
+      <div class="trial-left">
+        <div class="trial-tag">Business Trial</div>
+        <h3>Try full governance before you commit.</h3>
+        <p>Start with a 14-day Business evaluation for qualified teams. Best for security, platform, and DevOps groups testing Sentinel on real workflows.</p>
+      </div>
+      <div class="trial-right">
+        <a href="/contact" class="trial-cta">Request Trial →</a>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-eyebrow">Modular</div>
+      <h2>Optional Add-ons</h2>
+      <p>Extend any paid plan with infrastructure and compliance extras.</p>
+    </div>
+
+    <div class="addons-grid">
+      <div class="addon">
+        <div class="addon-icon">🗄️</div>
+        <h4>Extended Audit Retention</h4>
+        <p>Retain tamper-evident audit history beyond your plan default for compliance and incident response.</p>
+        <div class="addon-price">3-year: +$99/mo<br>7-year: +$199/mo<br>Unlimited: +$299/mo</div>
+      </div>
+      <div class="addon">
+        <div class="addon-icon">🔒</div>
+        <h4>Private Deployment</h4>
+        <p>Run Sentinel entirely inside your own environment for strict data and network isolation.</p>
+        <div class="addon-price">+$500 setup<br>+$300/mo ongoing</div>
+      </div>
+      <div class="addon">
+        <div class="addon-icon">🌐</div>
+        <h4>Multi-Region Support</h4>
+        <p>Deploy governance nodes across regions for lower latency and higher resilience.</p>
+        <div class="addon-price">+$299/mo per region</div>
+      </div>
+      <div class="addon">
+        <div class="addon-icon">🔐</div>
+        <h4>Hardware Identity</h4>
+        <p>TPM and HSM-backed identity for environments requiring stronger trust roots.</p>
+        <div class="addon-price">+$499/mo<br>Included in Enterprise</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-eyebrow">Questions</div>
+      <h2>Frequently asked</h2>
+    </div>
+
+    <div class="faq-grid">
+      <div class="faq">
+        <h4>What counts as a request?</h4>
+        <p>Any signed action request processed by Sentinel counts, whether it is allowed, reviewed, or denied.</p>
+      </div>
+      <div class="faq">
+        <h4>Can I switch plans later?</h4>
+        <p>Yes. Upgrades apply immediately. Downgrades apply at the next billing cycle.</p>
+      </div>
+      <div class="faq">
+        <h4>Why is Developer limited to layers 1–6?</h4>
+        <p>Developer is designed for evaluation. Production governance features like execution, reporting, and forensics start on paid tiers.</p>
+      </div>
+      <div class="faq">
+        <h4>Does Startup support production use?</h4>
+        <p>Yes. Startup is the first paid production tier, with approval workflow, action reports, and audit logging.</p>
+      </div>
+      <div class="faq">
+        <h4>What makes Business different?</h4>
+        <p>Business adds the full governance story: execution ledger, live timeline, replay & forensics, and security scoring.</p>
+      </div>
+      <div class="faq">
+        <h4>How is Enterprise priced?</h4>
+        <p>Enterprise pricing depends on deployment model, agent count, request volume, retention, compliance requirements, and support level.</p>
+      </div>
+    </div>
+
+    <div class="final-cta">
+      <h2>Every agent. Every action.<br>Governed.</h2>
+      <p>Start free in sandbox. Move into production with Startup. Unlock full governance with Business.</p>
+      <div class="cta-row">
+        <a href="/dashboard" class="btn-a">Start Free →</a>
+        <a href="/contact" class="btn-b">Talk to Sales</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-inner">
+      <p>© 2026 Sentinel SCA Limited · Sentinel Compliance Agent · sentinelsca.com</p>
+      <ul class="foot-links">
+        <li><a href="https://github.com/sentinelSCA/sentinel">GitHub</a></li>
+        <li><a href="/docs">Docs</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    function setBilling(type, el) {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      const isAnnual = type === 'annual';
+
+      document.querySelectorAll('.price-val[data-m]').forEach(node => {
+        const raw = isAnnual ? parseInt(node.dataset.a, 10) : parseInt(node.dataset.m, 10);
+        node.textContent = raw >= 1000 ? raw.toLocaleString() : raw;
+      });
+
+      const startup = document.getElementById('an-startup');
+      const business = document.getElementById('an-business');
+      if (startup) startup.classList.toggle('show', isAnnual);
+      if (business) business.classList.toggle('show', isAnnual);
+
+      document.querySelectorAll('.price-period').forEach(node => {
+        if (node.textContent.includes('billed')) {
+          node.textContent = isAnnual
+            ? 'per month · billed annually'
+            : 'per month · billed monthly';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

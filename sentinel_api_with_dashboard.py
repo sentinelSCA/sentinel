@@ -4,14 +4,14 @@ import html
 import time
 import redis
 
-from fastapi import Response, HTTPException
+from fastapi import Response, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
-from jinja2 import Environment, FileSystemLoader
+from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sentinel_api import app
 from ops_digest import digest_action
 
-templates = Environment(loader=FileSystemLoader("/app/templates"))
+templates = Jinja2Templates(directory="/app/templates")
 
 app.mount("/static", StaticFiles(directory="/app/static"), name="static")
 
@@ -251,12 +251,10 @@ def render_timeline() -> str:
     </section>
     """
 
-from fastapi.responses import Response
 
-@app.get("/", include_in_schema=False)
-def homepage():
-    html = templates.get_template("homepage.html").render()
-    return Response(content=html, media_type="text/html")
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+def homepage(request: Request):
+    return templates.TemplateResponse("homepage.html", {"request": request})
 
 def render_telemetry_panel() -> str:
     agents = load_agents()

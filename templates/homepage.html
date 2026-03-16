@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sentinel - Deterministic Execution Firewall for AI Agents</title>
-
+<title>Sentinel SCA — Governance Infrastructure for AI Agents</title>
+<link rel="icon" href="/static/logo.jpg">
 <style>
 :root{
   --bg:#050b1a;
@@ -16,7 +16,6 @@
   --accent:#2563eb;
   --accent-soft:#60a5fa;
   --good:#22c55e;
-  --bad:#ef4444;
 }
 *{box-sizing:border-box}
 body{
@@ -42,9 +41,17 @@ a{color:inherit}
   padding:14px 0 6px 0;
 }
 .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
   font-size:22px;
   font-weight:800;
   letter-spacing:-0.02em;
+}
+.brand img{
+  height:36px;
+  width:auto;
+  border-radius:8px;
 }
 .nav-links{
   display:flex;
@@ -84,13 +91,13 @@ h1{
 .lead{
   font-size:19px;
   color:#c7d2fe;
-  max-width:820px;
+  max-width:860px;
   margin:0;
 }
 .sublead{
   margin-top:14px;
   color:var(--muted);
-  max-width:820px;
+  max-width:860px;
   font-size:16px;
 }
 .actions{
@@ -128,19 +135,43 @@ a.btn.secondary{
 .section p{
   color:var(--muted);
 }
-.cards{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:18px;
-  margin-top:8px;
+.inline-note{
+  color:#dbeafe;
+  font-size:14px;
+  margin-top:10px;
 }
-.card{
+.code-grid,
+.proof-grid,
+.cards,
+.pricing-preview,
+.status-grid{
+  display:grid;
+  gap:18px;
+  margin-top:10px;
+}
+.code-grid,
+.proof-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.cards{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.pricing-preview{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.status-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.card,
+.tier,
+.status-card{
   background:var(--panel-2);
   border:1px solid var(--border);
   border-radius:18px;
   padding:20px;
 }
-.card h3{
+.card h3,
+.tier h3{
   margin:0 0 10px 0;
   font-size:18px;
 }
@@ -149,26 +180,18 @@ a.btn.secondary{
   color:var(--muted);
   font-size:15px;
 }
-.flow{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-  margin-top:10px;
-  align-items:center;
-}
-.flow-step{
-  text-align:center;
-  padding:16px 12px;
-  background:var(--panel-2);
-  border:1px solid var(--border);
+.codebox,
+.proofbox{
+  margin:0;
+  padding:16px;
   border-radius:16px;
-  font-weight:600;
-}
-.flow-arrow{
-  text-align:center;
-  color:var(--accent-soft);
-  font-size:22px;
-  font-weight:700;
+  border:1px solid var(--border);
+  background:#0b1327;
+  color:#dbeafe;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;
+  white-space:pre-wrap;
+  overflow:auto;
 }
 .preview{
   margin-top:10px;
@@ -180,39 +203,33 @@ a.btn.secondary{
   border:1px solid #24324d;
   box-shadow:0 20px 50px rgba(0,0,0,.28);
 }
-.compare-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
-  margin-top:10px;
-}
-.compare-card{
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:20px;
-}
-.compare-card.bad{
-  border-color:rgba(239,68,68,.35);
-}
-.compare-card.good{
-  border-color:rgba(34,197,94,.35);
-}
-.compare-card h3{
-  margin:0 0 10px 0;
-}
-.compare-card ul{
-  margin:14px 0 0 18px;
+.status-label{
+  font-size:13px;
   color:var(--muted);
+  margin-bottom:8px;
 }
-.compare-card pre{
-  margin:14px 0 0 0;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#0b1327;
-  color:#dbeafe;
-  white-space:pre-wrap;
+.status-value{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  color:#dcfce7;
+}
+.status-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--good);
+  box-shadow:0 0 10px rgba(34,197,94,.45);
+}
+.tier .price{
+  font-size:30px;
+  font-weight:800;
+  margin:6px 0 12px 0;
+}
+.tier ul{
+  margin:0 0 0 18px;
+  color:var(--muted);
 }
 .cta{
   display:flex;
@@ -250,36 +267,20 @@ a.btn.secondary{
   color:var(--text);
 }
 @media (max-width: 960px){
-  h1{
-    font-size:42px;
-  }
-  .cards{
-    grid-template-columns:1fr;
-  }
-  .flow{
-    grid-template-columns:1fr;
-  }
-  .flow-arrow{
-    transform:rotate(90deg);
-  }
-  .compare-grid{
+  h1{font-size:42px}
+  .cards,
+  .pricing-preview,
+  .code-grid,
+  .proof-grid,
+  .status-grid{
     grid-template-columns:1fr;
   }
 }
 @media (max-width: 640px){
-  .wrap{
-    padding:18px;
-  }
-  h1{
-    font-size:34px;
-  }
-  .lead{
-    font-size:17px;
-  }
-  .nav{
-    flex-direction:column;
-    align-items:flex-start;
-  }
+  .wrap{padding:18px}
+  h1{font-size:34px}
+  .lead{font-size:17px}
+  .nav{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
@@ -287,119 +288,225 @@ a.btn.secondary{
 <div class="wrap">
 
   <nav class="nav">
-    <div class="brand">Sentinel</div>
+    <div class="brand">
+      <img src="/static/logo.jpg" alt="Sentinel SCA logo">
+      <span>Sentinel SCA</span>
+    </div>
     <div class="nav-links">
-      <a href="#how-it-works">How It Works</a>
-      <a href="/docs">Docs</a>
-      <a href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="#integration">Quick Start</a>
+      <a href="#architecture">Architecture</a>
       <a href="/pricing">Pricing</a>
-      <a href="mailto:sentinel.labs.ai@gmail.com">Contact</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="/contact">Contact</a>
     </div>
   </nav>
 
   <section class="hero">
-    <div class="eyebrow">AI Agent Security Control Plane</div>
-    <h1>Deterministic execution firewall for AI agents.</h1>
+    <div class="eyebrow">Governance Infrastructure for AI Agents</div>
+    <h1>Govern Every AI Agent.</h1>
     <p class="lead">
-      Sentinel is a security control plane that ensures every AI agent action is authenticated, evaluated, and approved before it can affect real systems.
+      Sentinel SCA is governance infrastructure for AI agents that enforces security policies, records actions in a tamper-evident ledger, and enables forensic replay of autonomous systems.
     </p>
     <p class="sublead">
-      It sits between autonomous agents and infrastructure, verifies signed requests, enforces deterministic policy, routes sensitive actions for human approval, and records tamper-evident audit trails.
+      Built for developers. Designed for enterprise governance. Every request can be validated, scored, recorded, and reconstructed before it affects real systems.
     </p>
     <div class="actions">
-      <a class="btn" href="/dashboard">Open Dashboard</a>
+      <a class="btn" href="/dashboard">Start Free</a>
+      <a class="btn secondary" href="/pricing">View Pricing</a>
       <a class="btn secondary" href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">View GitHub</a>
-      <a class="btn secondary" href="mailto:sentinel.labs.ai@gmail.com">Request Access</a>
     </div>
+    <div class="inline-note">13-Layer Governance Architecture • Deterministic Decisions • Tamper-Evident Ledger</div>
   </section>
-
-  
 
   <section class="section">
-    <h2>Why Sentinel Exists</h2>
-    <div class="compare-grid">
-      <div class="compare-card bad">
-        <h3>Without Sentinel</h3>
-        <p>AI agents execute commands directly against infrastructure with little or no control boundary.</p>
-        <pre>restart_service(redis)
-
-Executed automatically</pre>
-        <ul>
-          <li>No signed agent identity</li>
-          <li>No deterministic policy enforcement</li>
-          <li>No human approval workflow</li>
-          <li>No reliable audit trail</li>
-        </ul>
+    <h2>System Status</h2>
+    <p>Live governance infrastructure for autonomous systems.</p>
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="status-label">API</div>
+        <div class="status-value"><span class="status-dot"></span>Online</div>
       </div>
-      <div class="compare-card good">
-        <h3>With Sentinel</h3>
-        <p>Every AI action passes through a governed execution path before reaching real systems.</p>
-        <pre>restart_service(redis)
-
-Risk: HIGH
-Decision: REVIEW
-Operator: REJECT</pre>
-        <ul>
-          <li>Signed agent identity</li>
-          <li>Deterministic allow / review / deny policy</li>
-          <li>Human approval for sensitive actions</li>
-          <li>Full auditability and telemetry</li>
-        </ul>
+      <div class="status-card">
+        <div class="status-label">Governance Engine</div>
+        <div class="status-value"><span class="status-dot"></span>Active</div>
+      </div>
+      <div class="status-card">
+        <div class="status-label">Ledger Integrity</div>
+        <div class="status-value"><span class="status-dot"></span>Verified</div>
+      </div>
+      <div class="status-card">
+        <div class="status-label">Replay Engine</div>
+        <div class="status-value"><span class="status-dot"></span>Available</div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="how-it-works">
-    <h2>How It Works</h2>
+  <section class="section" id="integration">
+    <h2>Secure Your First Agent in 30 Seconds</h2>
+    <p>Register an agent, send a signed action request, and let Sentinel evaluate it through the governance pipeline.</p>
+    <div class="code-grid">
+      <pre class="codebox">POST /api/v2/simulate
+Host: sentinelsca.com
+Content-Type: application/json
+
+{
+  "agent_id": "deploy-bot-7",
+  "command": "{\"type\":\"restart_service\",\"target\":\"redis\"}",
+  "timestamp": "1773214000",
+  "reputation": 0
+}</pre>
+      <pre class="codebox">{
+  "decision": "review",
+  "risk": "high",
+  "risk_score": 0.90,
+  "action_hash": "42655ff189d230e08381f7d413f836513a53a73308136f700a164c2dd56c7ae1",
+  "ledger_hash": "3f43319a74c4318ecd7d16ab6ca73360a02e4b1119cdbf0119c76f1047879591"
+}</pre>
+    </div>
+    <div class="inline-note">Works with custom agents, OpenAI-based agents, orchestration tools, and internal automation systems.</div>
+  </section>
+
+  <section class="section" id="architecture">
+    <h2>13-Layer Governance Architecture</h2>
+    <p>
+      Every AI agent action passes through Sentinel’s deterministic governance pipeline before execution, recording, replay, and scoring.
+    </p>
+    <div class="preview">
+      <img src="/static/architecture.png" alt="Sentinel 13-Layer Governance Architecture">
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Real-Time Governance Decisions</h2>
+    <p>Every request is evaluated, scored, recorded, and replayable.</p>
+    <div class="proof-grid">
+      <pre class="proofbox">Agent: deploy-bot-7
+Action: restart_service(redis)
+
+Decision: REVIEW
+Risk Score: 0.90
+Security Score: 86
+
+Ledger Hash:
+3f43319a74c4318ecd7d16ab6ca73360a02e4b1119cdbf0119c76f1047879591
+
+Action Hash:
+42655ff189d230e08381f7d413f836513a53a73308136f700a164c2dd56c7ae1</pre>
+      <pre class="proofbox">Replay Event:
+evt_57a81824fe0e
+
+Action:
+restart_service(redis)
+
+Decision:
+REVIEW
+
+Timestamp:
+2026-03-15T16:45:08Z
+
+Replay Available:
+GET /api/v2/replay/evt_57a81824fe0e</pre>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Operator Dashboard</h2>
+    <p>Monitor agent behavior, review risky actions, and investigate incidents from one dashboard.</p>
+    <div class="preview">
+      <img src="/static/dashboard.png" alt="Sentinel Dashboard">
+    </div>
+    <div class="inline-note">Live governance timeline with scoring, action decisions, and replay visibility.</div>
+  </section>
+
+  <section class="section">
+    <h2>Built for Secure Autonomous Infrastructure</h2>
     <div class="cards">
       <div class="card">
-        <h3>Signed Agent Identity</h3>
-        <p>Every agent signs its actions with Ed25519 keys, so security teams know exactly which AI system issued each request.</p>
+        <h3>Agent Identity</h3>
+        <p>Cryptographic identity using Ed25519 keys ensures every request is tied to a known autonomous system.</p>
       </div>
       <div class="card">
-        <h3>Deterministic Policy</h3>
-        <p>Every command is evaluated by explicit policy rules, so high-risk actions are blocked or routed to review instead of being trusted by default.</p>
+        <h3>Policy Engine</h3>
+        <p>Deterministic allow, review, or deny decisions ensure risky actions never bypass governance.</p>
       </div>
       <div class="card">
-        <h3>Controlled Execution</h3>
-        <p>Approved actions execute only through queue-backed workers and safe adapters, keeping humans in control of production-impacting changes.</p>
+        <h3>Execution Ledger</h3>
+        <p>Every decision is written to a tamper-evident ledger for auditability and incident reconstruction.</p>
+      </div>
+      <div class="card">
+        <h3>Live Timeline</h3>
+        <p>Operators get a real-time view of agent actions, decisions, and system behavior as it happens.</p>
+      </div>
+      <div class="card">
+        <h3>Replay & Forensics</h3>
+        <p>Any event can be replayed later to reconstruct what happened and why Sentinel made its decision.</p>
+      </div>
+      <div class="card">
+        <h3>Security Scoring</h3>
+        <p>Agents receive behavioral security scores based on governance outcomes and risk patterns.</p>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <h2>Architecture</h2>
-    <p>Sentinel creates an enforcement boundary between AI agents and production systems.</p>
-    <div class="flow">
-      <div class="flow-step">AI Agent</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">Sentinel Policy</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">Safe Execution</div>
+    <h2>Simple Pricing for Every Stage</h2>
+    <div class="pricing-preview">
+      <div class="tier">
+        <h3>Developer</h3>
+        <div class="price">Free</div>
+        <ul>
+          <li>1 agent</li>
+          <li>1,000 requests / month</li>
+          <li>Layers 1–6</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <h3>Startup</h3>
+        <div class="price">$199/mo</div>
+        <ul>
+          <li>Up to 10 agents</li>
+          <li>100,000 requests / month</li>
+          <li>Production governance</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <h3>Business</h3>
+        <div class="price">$999/mo</div>
+        <ul>
+          <li>Up to 50 agents</li>
+          <li>500,000 requests / month</li>
+          <li>Full 13-layer governance</li>
+        </ul>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/pricing">View Full Pricing</a>
     </div>
   </section>
 
   <section class="section">
     <div class="cta">
       <div class="cta-copy">
-        <h2>Built for real execution control</h2>
-        <p>Sentinel is currently onboarding early design partners for AI infrastructure governance and agent security.</p>
+        <h2>Every Agent. Every Action. Governed.</h2>
+        <p>Start free in sandbox. Move to production with Startup. Unlock full governance with Business.</p>
       </div>
       <div class="actions" style="margin-top:0">
-        <a class="btn" href="mailto:sentinel.labs.ai@gmail.com">Request Access</a>
+        <a class="btn" href="/dashboard">Start Free</a>
+        <a class="btn secondary" href="/contact">Talk to Sales</a>
       </div>
     </div>
-    <div class="footer-note">Deterministic policy. Controlled execution. Tamper-evident auditability.</div>
+    <div class="footer-note">Sentinel SCA — Governance infrastructure for autonomous systems.</div>
   </section>
 
   <div class="footer">
-    <div>Sentinel — The firewall for autonomous AI agents.</div>
+    <div>Sentinel SCA — Governance infrastructure for AI agents.</div>
     <div>
       <a href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">GitHub</a>
       ·
-      <a href="/docs">Docs</a>
+      <a href="/pricing">Pricing</a>
       ·
-      <a href="mailto:sentinel.labs.ai@gmail.com">Contact</a>
+      <a href="/contact">Contact</a>
     </div>
   </div>
 
