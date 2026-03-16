@@ -1,5 +1,11 @@
 # Sentinel SCA
 
+
+![Sentinel Dashboard](static/dashboard.png)
+
+Governance infrastructure for autonomous AI systems.
+
+
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Python](https://img.shields.io/badge/python-3.10+-blue)
 ![Category](https://img.shields.io/badge/category-AI%20Agent%20Security-red)
