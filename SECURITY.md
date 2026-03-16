@@ -5,7 +5,7 @@
 If you discover a vulnerability in Sentinel, please report it privately.
 
 Email:
-sentinel.labs.ai@gmail.com
+sentinelsca@gmail.com
 
 Please include:
 
