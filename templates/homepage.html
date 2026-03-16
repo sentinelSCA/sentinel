@@ -285,6 +285,78 @@ a.btn.secondary{
   .lead{font-size:17px}
   .nav{flex-direction:column;align-items:flex-start}
 }
+
+.chat-launcher{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:9999;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:12px 16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,.3);
+}
+.chat-panel{
+  position:fixed;
+  right:20px;
+  bottom:76px;
+  width:340px;
+  max-width:calc(100vw - 40px);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  z-index:9999;
+  display:none;
+  overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.chat-head{
+  padding:12px 14px;
+  font-weight:700;
+  border-bottom:1px solid var(--border);
+}
+.chat-body{
+  padding:14px;
+  max-height:360px;
+  overflow:auto;
+}
+.chat-msg{
+  margin-bottom:12px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  font-size:14px;
+  white-space:pre-wrap;
+}
+.chat-form{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid var(--border);
+}
+.chat-input{
+  flex:1;
+  background:var(--panel-2);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+}
+.chat-send{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
 </style>
 </head>
 <body>
@@ -514,5 +586,62 @@ GET /api/v2/replay/evt_57a81824fe0e</pre>
   </div>
 
 </div>
+
+<button id="sentinel-chat-launcher" class="chat-launcher">Ask about Sentinel</button>
+
+<div id="sentinel-chat-panel" class="chat-panel">
+  <div class="chat-head">Sentinel Website Assistant</div>
+  <div id="sentinel-chat-body" class="chat-body">
+    <div class="chat-msg">Ask about Sentinel SCA, pricing, architecture, security scoring, or how the governance pipeline works.</div>
+  </div>
+  <form id="sentinel-chat-form" class="chat-form">
+    <input id="sentinel-chat-input" class="chat-input" placeholder="Ask about Sentinel..." />
+    <button class="chat-send" type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+(function(){
+  const launcher = document.getElementById("sentinel-chat-launcher");
+  const panel = document.getElementById("sentinel-chat-panel");
+  const form = document.getElementById("sentinel-chat-form");
+  const input = document.getElementById("sentinel-chat-input");
+  const body = document.getElementById("sentinel-chat-body");
+
+  launcher.addEventListener("click", () => {
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+  });
+
+  function addMsg(text) {
+    const div = document.createElement("div");
+    div.className = "chat-msg";
+    div.textContent = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const question = input.value.trim();
+    if (!question) return;
+    addMsg("You: " + question);
+    input.value = "";
+    addMsg("Assistant: Thinking...");
+
+    try {
+      const res = await fetch("/api/v2/faq-chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({question})
+      });
+      const data = await res.json();
+      body.lastChild.textContent = "Assistant: " + (data.answer || data.detail || "No answer.");
+    } catch (err) {
+      body.lastChild.textContent = "Assistant: I’m unavailable right now.";
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

@@ -50,13 +50,11 @@ def load_aliases():
 def tokenize(text):
     tokens = re.findall(r"[a-zA-Z0-9_]+", text.lower())
     expanded = []
-
     for t in tokens:
         expanded.append(t)
         for k, syns in SYNONYMS.items():
             if t == k or t in syns:
                 expanded.append(k)
-
     return expanded
 
 def blocked_question(question):
@@ -80,11 +78,9 @@ def alias_match(question, faq):
 def score(question, faq_q, faq_a):
     q_tokens = tokenize(question)
     faq_text = (faq_q + " " + faq_a).lower()
-
     score_value = 0
     for token in q_tokens:
         score_value += faq_text.count(token)
-
     return score_value
 
 def answer_from_faq(question):
@@ -124,5 +120,5 @@ if __name__ == "__main__":
     ]
 
     for t in tests:
-        print("\nQ:", t)
+        print("\\nQ:", t)
         print("A:", answer_from_faq(t))

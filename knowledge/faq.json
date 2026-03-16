@@ -1,5 +1,13 @@
 [
   {
+    "question": "How does Sentinel work?",
+    "answer": "Sentinel sits between autonomous agents and real infrastructure, verifying identity, evaluating deterministic policy decisions, recording actions in a tamper-evident ledger, and enabling replay of historical events."
+  },
+  {
+    "question": "What does Sentinel do?",
+    "answer": "Sentinel SCA is governance infrastructure for AI agents that enforces security policies, records actions in a tamper-evident ledger, and enables forensic replay of autonomous systems."
+  },
+  {
     "question": "What is Sentinel SCA?",
     "answer": "Sentinel SCA is governance infrastructure for AI agents that enforces security policies, records actions in a tamper-evident ledger, and enables forensic replay of autonomous systems."
   },

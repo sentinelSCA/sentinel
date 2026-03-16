@@ -1,3 +1,4 @@
+from sentinel_faq import answer_from_faq
 from sentinel_contact import save_contact_request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -1172,3 +1173,14 @@ def security_score(limit: int = 200):
 @app.get("/pricing", response_class=HTMLResponse)
 def pricing_page(request: Request):
     return templates.TemplateResponse("pricing.html", {"request": request})
+
+
+# ----------------------------
+# Route: FAQ chat
+# ----------------------------
+@app.post("/api/v2/faq-chat")
+def faq_chat(payload: dict):
+    question = str((payload or {}).get("question", "")).strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question is required")
+    return {"answer": answer_from_faq(question)}
