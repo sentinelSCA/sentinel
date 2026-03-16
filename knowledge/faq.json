@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is Sentinel SCA?",
+    "answer": "Sentinel SCA is governance infrastructure for AI agents that enforces security policies, records actions in a tamper-evident ledger, and enables forensic replay of autonomous systems."
+  },
+  {
+    "question": "Why does Sentinel exist?",
+    "answer": "AI agents can perform real-world actions such as deploying code, modifying infrastructure, or interacting with APIs. Sentinel ensures those actions are authenticated, evaluated against deterministic policies, and recorded for auditability."
+  },
+  {
+    "question": "What problem does Sentinel solve?",
+    "answer": "Autonomous AI systems can execute unsafe or unauthorized actions. Sentinel introduces a governance layer between AI agents and infrastructure to ensure every action is evaluated, approved when necessary, and fully auditable."
+  },
+  {
+    "question": "How does Sentinel secure AI agents?",
+    "answer": "Sentinel requires agents to authenticate using Ed25519 cryptographic identities, evaluates each action through deterministic policy rules, and records every decision in a tamper-evident ledger."
+  },
+  {
+    "question": "What is AI agent governance?",
+    "answer": "AI agent governance refers to the systems and policies that control how autonomous AI agents interact with real infrastructure. Sentinel enforces governance by verifying identity, evaluating actions, and recording outcomes."
+  },
+  {
+    "question": "What are the 13 governance layers in Sentinel?",
+    "answer": "Sentinel’s architecture includes agent identity verification, capability tokens, schema validation, behavior limits, deterministic policy evaluation, action hashing, controlled execution, action reporting, execution ledger, audit logging, timeline monitoring, replay, and security scoring."
+  },
+  {
+    "question": "What is deterministic policy enforcement?",
+    "answer": "Deterministic policy enforcement means every action is evaluated using explicit rules that produce predictable decisions such as allow, review, or deny."
+  },
+  {
+    "question": "What decisions can Sentinel make?",
+    "answer": "Sentinel evaluates actions and produces one of three outcomes: ALLOW, REVIEW, or DENY."
+  },
+  {
+    "question": "What is the Sentinel execution ledger?",
+    "answer": "The execution ledger records every AI action and policy decision in a tamper-evident structure so security teams can audit system behavior."
+  },
+  {
+    "question": "What is a tamper-evident audit log?",
+    "answer": "A tamper-evident log uses cryptographic hashes so that any modification to historical records can be detected."
+  },
+  {
+    "question": "What is action replay?",
+    "answer": "Action replay allows operators to reconstruct past events by replaying AI actions and decisions recorded in the governance ledger."
+  },
+  {
+    "question": "What is the Sentinel timeline?",
+    "answer": "The timeline provides a chronological view of AI actions, decisions, and outcomes to help operators understand system behavior in real time."
+  },
+  {
+    "question": "What is security scoring?",
+    "answer": "Sentinel calculates security scores for AI agents based on behavioral patterns, governance outcomes, and risk levels."
+  },
+  {
+    "question": "How does Sentinel authenticate agents?",
+    "answer": "Agents authenticate using Ed25519 cryptographic signatures to prove identity and prevent impersonation."
+  },
+  {
+    "question": "What are capability tokens?",
+    "answer": "Capability tokens define which actions an agent is allowed to request, limiting what autonomous systems can attempt."
+  },
+  {
+    "question": "Does Sentinel replace existing security tools?",
+    "answer": "No. Sentinel acts as a governance layer specifically designed for autonomous AI agents interacting with infrastructure."
+  },
+  {
+    "question": "Can Sentinel control multiple AI agents?",
+    "answer": "Yes. Sentinel is designed to enforce governance across multiple autonomous systems operating within the same environment."
+  },
+  {
+    "question": "What environments can Sentinel protect?",
+    "answer": "Sentinel can govern AI agents interacting with infrastructure systems such as APIs, deployment pipelines, and automation platforms."
+  },
+  {
+    "question": "Is Sentinel open source?",
+    "answer": "The Sentinel project provides open components and documentation through its GitHub repository."
+  },
+  {
+    "question": "How can developers explore Sentinel?",
+    "answer": "Developers can explore Sentinel through the GitHub repository and API documentation."
+  },
+  {
+    "question": "How can organizations deploy Sentinel?",
+    "answer": "Sentinel can be deployed within infrastructure environments to monitor and govern AI agent actions."
+  },
+  {
+    "question": "What is the Sentinel dashboard?",
+    "answer": "The dashboard provides operators with visibility into AI actions, governance decisions, system telemetry, and security scores."
+  },
+  {
+    "question": "How does Sentinel help with incident investigation?",
+    "answer": "Because all actions are recorded in the ledger, investigators can replay and analyze events to determine exactly what occurred."
+  },
+  {
+    "question": "How much does Sentinel cost?",
+    "answer": "Sentinel offers developer, startup, and business plans. Pricing details are available on the pricing page."
+  },
+  {
+    "question": "How can I contact the Sentinel team?",
+    "answer": "You can contact the Sentinel team through the website contact page."
+  }
+]
