@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 FAQ_PATH = Path("knowledge/faq.json")
+ALIASES_PATH = Path("knowledge/faq_aliases.json")
 
 FALLBACK = "I don’t have information about that in Sentinel’s published FAQ. Please use the contact page for further questions."
 
@@ -22,13 +23,41 @@ BLOCK_PATTERNS = [
     r"\bwho uses\b",
 ]
 
+SYNONYMS = {
+    "security": ["secure", "protection"],
+    "architecture": ["layers", "pipeline", "structure"],
+    "authenticate": ["identity", "sign", "signature", "verified", "verify"],
+    "cost": ["price", "pricing"],
+    "agent": ["ai", "bot", "automation"],
+}
+
+def normalize(text: str) -> str:
+    text = text.lower().strip()
+    text = re.sub(r"[^a-z0-9\s]", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text
+
 def load_faq():
     if not FAQ_PATH.exists():
         return []
     return json.loads(FAQ_PATH.read_text(encoding="utf-8"))
 
+def load_aliases():
+    if not ALIASES_PATH.exists():
+        return {}
+    return json.loads(ALIASES_PATH.read_text(encoding="utf-8"))
+
 def tokenize(text):
-    return [t for t in re.findall(r"[a-zA-Z0-9_]+", text.lower()) if len(t) > 2]
+    tokens = re.findall(r"[a-zA-Z0-9_]+", text.lower())
+    expanded = []
+
+    for t in tokens:
+        expanded.append(t)
+        for k, syns in SYNONYMS.items():
+            if t == k or t in syns:
+                expanded.append(k)
+
+    return expanded
 
 def blocked_question(question):
     q = question.lower()
@@ -37,17 +66,24 @@ def blocked_question(question):
             return True
     return False
 
+def alias_match(question, faq):
+    aliases = load_aliases()
+    qn = normalize(question)
+    if qn not in aliases:
+        return None
+    target_q = aliases[qn]
+    for item in faq:
+        if item.get("question") == target_q:
+            return item
+    return None
+
 def score(question, faq_q, faq_a):
     q_tokens = tokenize(question)
-    faq_q_tokens = set(tokenize(faq_q))
-    faq_a_text = faq_a.lower()
+    faq_text = (faq_q + " " + faq_a).lower()
 
     score_value = 0
-
     for token in q_tokens:
-        if token in faq_q_tokens:
-            score_value += 4
-        score_value += faq_a_text.count(token)
+        score_value += faq_text.count(token)
 
     return score_value
 
@@ -59,6 +95,10 @@ def answer_from_faq(question):
     if not faq:
         return FALLBACK
 
+    aliased = alias_match(question, faq)
+    if aliased:
+        return aliased["answer"]
+
     best = None
     best_score = 0
 
@@ -68,24 +108,19 @@ def answer_from_faq(question):
             best_score = s
             best = item
 
-    if not best:
-        return FALLBACK
-
-    # Require a stronger match than before
-    if best_score < 4:
+    if not best or best_score < 3:
         return FALLBACK
 
     return best["answer"]
 
 if __name__ == "__main__":
     tests = [
-        "What is Sentinel SCA?",
-        "How does Sentinel secure AI agents?",
-        "What are capability tokens?",
-        "How much does Sentinel cost?",
-        "Who are Sentinel competitors?",
-        "Compare Sentinel to CrowdStrike",
-        "What is your roadmap?"
+        "What is Sentinel?",
+        "What does Sentinel do?",
+        "How does Sentinel work?",
+        "How are agents verified?",
+        "What is Sentinel pricing?",
+        "Compare Sentinel to CrowdStrike"
     ]
 
     for t in tests:
