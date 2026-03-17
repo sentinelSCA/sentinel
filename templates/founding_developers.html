@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Founding Developer Program — Sentinel SCA</title>
+  <style>
+    :root{
+      --bg:#05080f;
+      --bg2:#090d16;
+      --bg3:#0e1420;
+      --border:rgba(255,255,255,0.08);
+      --border2:rgba(255,255,255,0.14);
+      --text:#e2e8f4;
+      --muted:#8a96aa;
+      --accent:#00d4ff;
+      --accent2:#0044ee;
+      --green:#00e07a;
+      --gold:#f0a020;
+      --red:#ff4d6d;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      background:
+        radial-gradient(circle at top left, rgba(0,68,238,0.10), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0,212,255,0.08), transparent 30%),
+        linear-gradient(180deg,#05080f 0%,#08101b 100%);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      min-height:100vh;
+      line-height:1.6;
+    }
+    a{color:inherit}
+    nav{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(5,8,15,.88);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner{
+      max-width:980px;
+      margin:0 auto;
+      padding:0 24px;
+      height:60px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-decoration:none;
+    }
+    .logo-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 12px var(--accent);
+    }
+    .nav-back{
+      text-decoration:none;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .nav-back:hover{color:var(--text)}
+    .container{
+      max-width:980px;
+      margin:0 auto;
+      padding:0 24px 56px;
+    }
+    .hero{
+      padding:72px 0 40px;
+      text-align:center;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 14px;
+      border-radius:999px;
+      border:1px solid rgba(240,160,32,.25);
+      background:rgba(240,160,32,.06);
+      color:var(--gold);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      margin-bottom:24px;
+    }
+    h1{
+      font-size:clamp(36px,6vw,64px);
+      line-height:1.02;
+      letter-spacing:-.03em;
+      margin-bottom:16px;
+    }
+    h1 span{
+      background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .hero p{
+      max-width:680px;
+      margin:0 auto;
+      color:var(--muted);
+      font-size:17px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+      margin-top:28px;
+      margin-bottom:36px;
+    }
+    .card,.panel{
+      background:var(--bg2);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:24px;
+    }
+    .card h3,.panel h3{
+      font-size:18px;
+      margin-bottom:12px;
+      letter-spacing:-.02em;
+    }
+    .label{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+    .label.give{color:var(--accent)}
+    .label.get{color:var(--green)}
+    ul{
+      padding-left:18px;
+      color:var(--muted);
+    }
+    li{margin:8px 0}
+    .section-title{
+      margin:10px 0 16px;
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .steps{
+      display:grid;
+      gap:14px;
+    }
+    .step{
+      display:flex;
+      gap:14px;
+    }
+    .step-num{
+      min-width:78px;
+      height:28px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.08em;
+      border:1px solid rgba(0,212,255,.18);
+      color:var(--accent);
+      background:rgba(0,212,255,.06);
+    }
+    .step h4{
+      font-size:15px;
+      margin-bottom:4px;
+    }
+    .step p{color:var(--muted);font-size:14px}
+    .terms{
+      display:grid;
+      gap:10px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .terms strong{color:var(--text)}
+    .form-wrap{
+      margin-top:34px;
+      background:var(--bg2);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:28px;
+    }
+    .form-wrap p{color:var(--muted);margin-bottom:18px}
+    .row{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+    .group{margin-bottom:16px}
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:8px;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    input, textarea, select{
+      width:100%;
+      background:var(--bg3);
+      border:1px solid var(--border2);
+      color:var(--text);
+      border-radius:12px;
+      padding:13px 14px;
+      font-size:14px;
+      outline:none;
+    }
+    textarea{min-height:110px;resize:vertical}
+    input:focus, textarea:focus, select:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(0,212,255,.10);
+    }
+    .checks{
+      display:grid;
+      gap:12px;
+      margin:8px 0 18px;
+    }
+    .check{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .check input{
+      width:16px;height:16px;margin-top:3px;
+      accent-color:var(--accent);
+    }
+    .btn{
+      display:inline-block;
+      width:100%;
+      border:none;
+      border-radius:12px;
+      padding:15px 18px;
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.02em;
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+      color:#00101a;
+    }
+    .btn:hover{opacity:.92}
+    .fine{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .success{
+      display:none;
+      margin-top:18px;
+      padding:18px;
+      border-radius:14px;
+      border:1px solid rgba(0,224,122,.25);
+      background:rgba(0,224,122,.08);
+      color:#d7ffe8;
+    }
+    footer{
+      border-top:1px solid var(--border);
+      padding:28px 0;
+      margin-top:46px;
+    }
+    .foot{
+      max-width:980px;
+      margin:0 auto;
+      padding:0 24px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .foot-links{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .foot-links a{text-decoration:none;color:var(--muted)}
+    .foot-links a:hover{color:var(--text)}
+    @media (max-width: 760px){
+      .grid,.row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-dot"></span>
+        <span>SENTINEL SCA</span>
+      </a>
+      <a href="/" class="nav-back">← Back to sentinelsca.com</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="hero">
+      <div class="eyebrow">3 spots available · 30-day program</div>
+      <h1>Founding <span>Developer Program</span></h1>
+      <p>
+        We’re inviting 3 developers to test Sentinel SCA for 30 days with full access to the platform.
+        Use it with real workflows, stress test the governance pipeline, and help shape what Sentinel becomes.
+      </p>
+    </section>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label give">What we ask from you</div>
+        <ul>
+          <li>Test Sentinel with a real workflow for 2–4 weeks</li>
+          <li>Submit at least 100 meaningful action requests</li>
+          <li>Send one honest written feedback note</li>
+          <li>Publish one public post, short review, or GitHub contribution</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="label get">What you receive</div>
+        <ul>
+          <li>30 days of full platform access</li>
+          <li>Direct founder support</li>
+          <li>Early influence on roadmap</li>
+          <li>Founding Developer recognition</li>
+          <li>50% discount on a paid plan if you continue</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">Suggested review structure</div>
+    <div class="panel">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">Part 01</div>
+          <div>
+            <h4>Who you are</h4>
+            <p>Your role, what automation or agents you work with, and why Sentinel caught your attention.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">Part 02</div>
+          <div>
+            <h4>What you tested</h4>
+            <p>Which workflows you routed through Sentinel, what the policy engine did, and what the dashboard showed.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">Part 03</div>
+          <div>
+            <h4>Your honest verdict</h4>
+            <p>What worked, what felt rough, what you would change, and whether you would use Sentinel again.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Program terms</div>
+    <div class="panel">
+      <div class="terms">
+        <div><strong>1.</strong> Access is granted for 30 days from onboarding.</div>
+        <div><strong>2.</strong> You are expected to test Sentinel with real workflows, not just browse the UI.</div>
+        <div><strong>3.</strong> We ask for honest written feedback and one public post, short review, or GitHub contribution.</div>
+        <div><strong>4.</strong> Positive framing is not required. Honest feedback is the goal.</div>
+        <div><strong>5.</strong> Sentinel may quote your feedback publicly only with your permission.</div>
+        <div><strong>6.</strong> Sentinel may end access early if the platform is abused or used in bad faith.</div>
+      </div>
+    </div>
+
+    <div class="form-wrap">
+      <h3>Apply for a founding spot</h3>
+      <p>
+        Applications are reviewed manually. We respond within 48 hours.
+        We prioritize developers actively working with AI agents, DevOps automation, or autonomous workflows.
+      </p>
+
+      <form id="fdp-form" action="/contact" method="post">
+        <div class="row">
+          <div class="group">
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" required placeholder="Your name">
+          </div>
+          <div class="group">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" required placeholder="you@company.com">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="group">
+            <label for="company">Company or project</label>
+            <input id="company" name="company" type="text" placeholder="Company, side project, or independent">
+          </div>
+          <div class="group">
+            <label for="github">GitHub profile</label>
+            <input id="github" type="url" placeholder="https://github.com/yourname" required>
+          </div>
+        </div>
+
+        <div class="group">
+          <label for="workflow">What do you build?</label>
+          <textarea id="workflow" required placeholder="Describe the agents, workflows, infrastructure, or automation systems you work with."></textarea>
+        </div>
+
+        <div class="group">
+          <label for="goal">What would you want to test in Sentinel?</label>
+          <textarea id="goal" required placeholder="Describe the governance, security, policy, or audit scenarios you would focus on."></textarea>
+        </div>
+
+        <div class="group">
+          <label for="review">How would you likely contribute feedback?</label>
+          <select id="review" required>
+            <option value="" selected disabled>Select one</option>
+            <option>Public post on X</option>
+            <option>LinkedIn post</option>
+            <option>Short video review</option>
+            <option>GitHub issue or PR</option>
+            <option>Combination of the above</option>
+          </select>
+        </div>
+
+        <div class="checks">
+          <label class="check"><input type="checkbox" required> <span>I agree to test Sentinel with real workflows during the 30-day period.</span></label>
+          <label class="check"><input type="checkbox" required> <span>I agree to provide honest feedback.</span></label>
+          <label class="check"><input type="checkbox" required> <span>I understand this is an early developer program, not a paid engagement.</span></label>
+        </div>
+
+        <input type="hidden" name="use_case" value="Founding Developer Program application">
+        <input type="hidden" id="message" name="message" value="">
+
+        <button class="btn" type="submit">Submit Application →</button>
+        <div class="fine">No payment required · Manual review · contact@sentinelsca.com</div>
+        <div id="success" class="success">Application submitted. We’ll review it and reply within 48 hours.</div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot">
+      <div>© 2026 Sentinel SCA · Governance infrastructure for AI agents.</div>
+      <div class="foot-links">
+        <a href="/">Home</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/sentinelSCA/sentinel" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      const form = document.getElementById('fdp-form');
+      const success = document.getElementById('success');
+      const message = document.getElementById('message');
+
+      form.addEventListener('submit', function(){
+        const github = document.getElementById('github').value.trim();
+        const workflow = document.getElementById('workflow').value.trim();
+        const goal = document.getElementById('goal').value.trim();
+        const review = document.getElementById('review').value;
+
+        message.value =
+`Founding Developer Program Application
+
+GitHub: ${github}
+
+What they build:
+${workflow}
+
+What they want to test:
+${goal}
+
+Likely feedback format:
+${review}`;
+        setTimeout(function(){ success.style.display = 'block'; }, 300);
+      });
+    })();
+  </script>
+</body>
+</html>

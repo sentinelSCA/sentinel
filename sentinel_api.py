@@ -1184,3 +1184,44 @@ def faq_chat(payload: dict):
     if not question:
         raise HTTPException(status_code=400, detail="Question is required")
     return {"answer": answer_from_faq(question)}
+
+
+# ----------------------------
+# Route: system status
+# ----------------------------
+@app.get("/api/v2/system-status")
+def system_status():
+    redis_ok = True
+    pending_actions = 0
+    approved_actions = 0
+    rejected_actions = 0
+    executed_actions = 0
+
+    try:
+        r = redis.from_url(REDIS_URL, decode_responses=True)
+        r.ping()
+        pending_actions = int(r.llen("ops:actions:needs_human"))
+        approved_actions = int(r.llen("ops:actions:approved"))
+        rejected_actions = int(r.llen("ops:actions:rejected"))
+        executed_actions = int(r.llen("ops:actions:executed"))
+    except Exception:
+        redis_ok = False
+
+    return {
+        "api": "online",
+        "redis": "connected" if redis_ok else "disconnected",
+        "freeze": get_global_freeze(),
+        "pending_actions": pending_actions,
+        "approved_actions": approved_actions,
+        "rejected_actions": rejected_actions,
+        "executed_actions": executed_actions,
+        "timestamp": int(time.time())
+    }
+
+
+# ----------------------------
+# Route: founding developers
+# ----------------------------
+@app.get("/founding-developers", response_class=HTMLResponse)
+def founding_developers_page(request: Request):
+    return templates.TemplateResponse("founding_developers.html", {"request": request})
