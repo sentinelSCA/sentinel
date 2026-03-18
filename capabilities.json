@@ -1,0 +1,11 @@
+{
+  "deploy-bot-7": [
+    "deploy:staging",
+    "read:metrics",
+    "restart_service:redis"
+  ],
+  "ops-agent": [
+    "restart:service",
+    "read:logs"
+  ]
+}

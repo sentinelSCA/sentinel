@@ -15,24 +15,20 @@ venv/
 !.env.example
 
 # Runtime artifacts
+runtime_data/
 logs/
 outputs*/
 published_*/
 approved/
 rejected/
-agents.json
 audit/
 sentinel.db
 
-# Backups / scratch
-_backup/
-*.bak
-*.bak.*
-*.backup
-*.bundle
-*.broken.*
-*.disabled
-compose.yml.bad
+# Archives
+archive/
+
+# Dev only
+dev_only/
 
 # Build artifacts
 wheels/
@@ -43,24 +39,54 @@ Thumbs.db
 *~
 *.swp
 *.swo
-__pycache__/
 
-# runtime / workspace artifacts
+# Disabled configs
+*.disabled
+*.bak*
+EOFcat <<'EOF' > .gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.venv*/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime artifacts
+runtime_data/
 logs/
-outputs/
-outputs_email/
-outputs_twitter/
-outputs_writer/
-published_email/
-published_twitter/
+outputs*/
+published_*/
 approved/
 rejected/
+audit/
+sentinel.db
 
-# build artifacts
+# Archives
+archive/
+
+# Dev only
+dev_only/
+
+# Build artifacts
 wheels/
-*.egg-info/
 
-# disabled configs
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Disabled configs
 *.disabled
-
-capabilities.json
+*.bak*
+run_api.sh

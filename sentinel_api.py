@@ -10,6 +10,7 @@ from sentinel_report import build_action_report
 from sentinel_hashing import deterministic_action_hash
 from sentinel_limits import check_behavior_limits, record_behavior_event
 from sentinel_schema import validate_action_schema
+from sentinel_ops import create_action
 from sentinel_capabilities import has_capability
 import time
 import hmac
@@ -492,6 +493,7 @@ def contact_submit(
 # ----------------------------
 @app.get("/health")
 def health():
+
     return {
         "status": "ok",
         "policy_version": POLICY_VERSION,
@@ -798,84 +800,59 @@ def system_status():
 # ----------------------------
 @app.post("/api/v2/simulate")
 def simulate(req: AnalyzeRequest):
-
     validated_command = parse_and_validate_command(req.command)
     validated_command = validate_action_schema(validated_command)
     action_hash = deterministic_action_hash(req.agent_id, validated_command)
 
-    capability = ""
-    if isinstance(validated_command, dict):
-        action_type = str(validated_command.get("type", "")).strip()
-        target = str(validated_command.get("target", "")).strip()
-        if action_type and target:
-            capability = f"{action_type}:{target}"
-        elif action_type:
-            capability = action_type
+    action_id = f"sim-{int(time.time()*1000)}"
 
-    action_type_for_limits = ""
-    if isinstance(validated_command, dict):
-        action_type_for_limits = str(validated_command.get("type", "")).strip()
+    action_type = str(validated_command.get("type", "")).strip()
+    target = str(validated_command.get("target", "")).strip()
 
-    if capability and not has_capability(req.agent_id, capability):
+    auto_allow_types = {"read_url", "clear_cache"}
+    human_review_types = {"restart_service", "scale_service", "rotate_keys"}
+
+    if action_type in auto_allow_types:
+        decision = "allow"
+        risk = "low"
+        score = 0.20
+        reason = f"Low-risk action auto-approved: {action_type}"
+    elif action_type in human_review_types:
+        decision = "review"
+        if action_type in {"restart_service", "rotate_keys"}:
+            risk = "high"
+            score = 0.90
+        else:
+            risk = "medium"
+            score = 0.70
+        reason = f"Human approval required for action type: {action_type}"
+    else:
         decision = "deny"
         risk = "high"
         score = 0.95
-        reason = f"Capability not granted: {capability}"
-    else:
-        ok_limits, limit_reason = check_behavior_limits(req.agent_id, action_type_for_limits)
-        if not ok_limits:
-            decision = "deny"
-            risk = "high"
-            score = 0.95
-            reason = limit_reason
-        else:
-            decision, risk, score, reason = evaluate_command_v2(req.command, req.reputation)
-            record_behavior_event(req.agent_id, action_type_for_limits)
+        reason = f"Unsupported action type: {action_type}"
 
-    identity = "ed25519:registered-agent"
-    report = build_action_report(
+    rec = create_action(
+        action_id=action_id,
         agent_id=req.agent_id,
-        identity=identity,
-        capability=capability,
         action=validated_command,
-        decision=str(decision),
-        policy_version=POLICY_VERSION,
-        risk_score=float(score),
-        reason=str(reason),
-        action_hash=action_hash,
+        decision=decision,
+        risk=risk,
+        risk_score=score,
+        reason=reason,
     )
-    ledger_row = append_report(report)
-
-    timeline_event = build_timeline_event(report, ledger_row["ledger_hash"])
-    append_timeline_event(timeline_event)
-
-    rep_score_before = get_rep(req.agent_id)
-    if decision == "allow":
-        if rep_score_before < REP_AUTO_DENY:
-            decision = "deny"
-            risk = "high"
-            score = max(float(score), 0.95)
-            reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_DENY:.2f}"
-        elif rep_score_before < REP_AUTO_REVIEW:
-            decision = "review"
-            risk = "medium"
-            score = max(float(score), 0.65)
-            reason = f"Reputation gate: rep={rep_score_before:.2f} < {REP_AUTO_REVIEW:.2f}"
 
     return {
         "simulation": True,
         "agent_id": req.agent_id,
         "command": validated_command,
         "action_hash": action_hash,
-        "action_report": report,
-        "ledger_hash": ledger_row["ledger_hash"],
-        "decision": str(decision),
-        "risk": str(risk),
-        "risk_score": float(score),
-        "reason": str(reason),
-        "policy_version": POLICY_VERSION,
-        "reputation_input": float(req.reputation),
-        "rep_score_before": float(rep_score_before),
+        "decision": decision,
+        "risk": risk,
+        "risk_score": score,
+        "reason": reason,
+        "action_id": action_id,
+        "record": rec,
     }
 
 # ----------------------------

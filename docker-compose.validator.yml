@@ -28,7 +28,7 @@ services:
       - ./agents.json:/app/agents.json
       - ./static:/app/static
       - ./audit:/app/audit
-      - ./sentinel.db:/app/sentinel.db
+      - ./runtime_data/sentinel.db:/app/sentinel.db
     command: ["uvicorn", "sentinel_api_with_dashboard:app", "--host", "0.0.0.0", "--port", "8001"]
 
   manager-worker:
@@ -43,40 +43,6 @@ services:
       - redis
     command: ["python", "-u", "worker_manager.py"]
 
-  executor-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.executor
-    container_name: sentinel-executor-worker
-    restart: unless-stopped
-
-    env_file:
-      - .env
-
-    environment:
-      ALLOWED_TYPES: restart_service
-      ALLOWED_TARGETS: sentinel-api
-
-    depends_on:
-      - redis
-      - sentinel-api
-    command: ["python", "-u", "executor_worker.py"]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/app
-
-  approver-bot:
-    build:
-      context: .
-      dockerfile: Dockerfile.base
-    container_name: sentinel-approver-bot
-    restart: unless-stopped
-    env_file:
-      - .env
-    depends_on:
-      - redis
-    command: ["python", "-u", "approver_bot.py"]
-
   probe-worker:
     build:
       context: .
@@ -89,18 +55,6 @@ services:
       - redis
       - sentinel-api
     command: ["python", "-u", "worker_probe.py"]
-
-  reaper-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.base
-    container_name: sentinel-reaper-worker
-    restart: unless-stopped
-    env_file:
-      - .env
-    depends_on:
-      - redis
-    command: ["python", "-u", "worker_reaper.py"]
 
   portainer:
     image: portainer/portainer-ce:latest

@@ -345,34 +345,7 @@ pre{
     grid-template-columns:1fr;
   }
 }
-
-.risk-pill{
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.02em;
-  border:1px solid transparent;
-}
-.risk-pill.high{
-  background:rgba(239,68,68,0.12);
-  color:#fee2e2;
-  border-color:rgba(239,68,68,0.28);
-}
-.risk-pill.medium{
-  background:rgba(245,158,11,0.12);
-  color:#fde68a;
-  border-color:rgba(245,158,11,0.28);
-}
-.risk-pill.low{
-  background:rgba(34,197,94,0.12);
-  color:#dcfce7;
-  border-color:rgba(34,197,94,0.28);
-}
-
 </style>
-  <link rel="icon" href="/static/favicon.ico">
 </head>
 <body>
 <div class="wrap">
@@ -405,44 +378,44 @@ pre{
   <div class="stats">
     <div class="stat">
       <div class="stat-label">API</div>
-      <div id="stat-api" class="stat-value" style="color:#22c55e;">ONLINE</div>
+      <div class="stat-value" style="color:#22c55e;">ONLINE</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Redis</div>
-      <div id="stat-redis" class="stat-value" style="color:#22c55e;">CONNECTED</div>
+      <div class="stat-value" style="color:#22c55e;">CONNECTED</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Freeze</div>
-      <div id="stat-freeze" class="stat-value" style="color:{{ 'var(--bad)' if freeze_enabled else 'var(--good)' }}">
+      <div class="stat-value" style="color:{{ 'var(--bad)' if freeze_enabled else 'var(--good)' }}">
         {{ 'ON' if freeze_enabled else 'OFF' }}
       </div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Needs Review</div>
-      <div id="stat-needs-human" class="stat-value">{{ needs_human_count }}</div>
+      <div class="stat-value">{{ needs_human_count }}</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Approved</div>
-      <div id="stat-approved" class="stat-value">{{ approved_count }}</div>
+      <div class="stat-value">{{ approved_count }}</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Rejected</div>
-      <div id="stat-rejected" class="stat-value">{{ rejected_count }}</div>
+      <div class="stat-value">{{ rejected_count }}</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Executed</div>
-      <div id="stat-executed" class="stat-value">{{ executed_count }}</div>
+      <div class="stat-value">{{ executed_count }}</div>
     </div>
 
     <div class="stat">
       <div class="stat-label">Agents</div>
-      <div id="stat-agents" class="stat-value">{{ agents_count }}</div>
+      <div class="stat-value">{{ agents_count }}</div>
     </div>
   </div>
 
@@ -456,7 +429,7 @@ pre{
 
   <div id="priority-queue" class="section-title">Needs Review Queue</div>
   <div class="grid">
-    <div id="panel-needs-human" class="span-2">{{ needs_human_panel|safe }}</div>
+    <div class="span-2">{{ needs_human_panel|safe }}</div>
   </div>
 
   <div class="section-title">Agents</div>
@@ -466,14 +439,14 @@ pre{
 
   <div id="recent-activity" class="section-title">Recent Activity</div>
   <div class="grid">
-    <div id="panel-timeline" class="span-2">{{ timeline_panel|safe }}</div>
+    <div class="span-2">{{ timeline_panel|safe }}</div>
   </div>
 
   <div class="section-title">Decision History</div>
   <div class="grid">
-    <div id="panel-approved">{{ approved_panel|safe }}</div>
-    <div id="panel-rejected">{{ rejected_panel|safe }}</div>
-    <div id="panel-executed" class="span-2">{{ executed_panel|safe }}</div>
+    <div>{{ approved_panel|safe }}</div>
+    <div>{{ rejected_panel|safe }}</div>
+    <div class="span-2">{{ executed_panel|safe }}</div>
   </div>
 </div>
 
@@ -500,57 +473,23 @@ if (ctx) {
     }
   });
 }
-</script>
 
 <script>
-async function refreshDashboard() {
-  try {
-    const res = await fetch('/dashboard/data', {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!res.ok) return;
+(function () {
+  const REFRESH_MS = 5000;
 
-    const data = await res.json();
-    const counts = data.counts || {};
-    const panels = data.panels || {};
-
-    const setText = (id, value) => {
-      const el = document.getElementById(id);
-      if (el && value !== undefined && value !== null) el.textContent = String(value);
-    };
-
-    setText('stat-api', 'ONLINE');
-    setText('stat-redis', 'CONNECTED');
-    setText('stat-freeze', counts.freeze ? 'ON' : 'OFF');
-    setText('stat-needs-human', counts.needs_human ?? 0);
-    setText('stat-approved', counts.approved ?? 0);
-    setText('stat-rejected', counts.rejected ?? 0);
-    setText('stat-executed', counts.executed ?? 0);
-    setText('stat-agents', counts.agents ?? 0);
-
-    const freezeEl = document.getElementById('stat-freeze');
-    if (freezeEl) {
-      freezeEl.style.color = counts.freeze ? 'var(--bad)' : 'var(--good)';
-    }
-
-    const setHTML = (id, html) => {
-      const el = document.getElementById(id);
-      if (el && typeof html === 'string') el.innerHTML = html;
-    };
-
-    setHTML('panel-needs-human', panels.needs_human);
-    setHTML('panel-timeline', panels.timeline);
-    setHTML('panel-approved', panels.approved);
-    setHTML('panel-rejected', panels.rejected);
-    setHTML('panel-executed', panels.executed);
-  } catch (e) {
-    console.debug('dashboard refresh skipped', e);
+  function shouldRefresh() {
+    if (document.hidden) return false;
+    const active = document.activeElement;
+    if (active && ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName)) return false;
+    return true;
   }
-}
 
-setInterval(refreshDashboard, 5000);
+  setInterval(() => {
+    if (!shouldRefresh()) return;
+    window.location.reload();
+  }, REFRESH_MS);
+})();
 </script>
-
 </body>
 </html>
