@@ -90,3 +90,6 @@ Thumbs.db
 *.disabled
 *.bak*
 run_api.sh
+agent_auth.json
+agents.json
+capabilities.json
