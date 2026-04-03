@@ -118,3 +118,12 @@ build/
 # local test and temp
 sentinel-sdk-test/
 dev_only/
+
+# local-only retained files
+data/
+legacy/
+openapi.json
+build_sdk_js.sh
+sdk-js/
+templates/guide.html
+sentinel_core/boundary_integration/
