@@ -93,3 +93,28 @@ run_api.sh
 agent_auth.json
 agents.json
 capabilities.json
+
+# runtime / local
+.env
+.env.*
+audit/
+runtime_data/
+backup/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# python
+__pycache__/
+*.pyc
+
+# generated / build
+sdk/build/
+dist/
+build/
+*.egg-info/
+
+# local test and temp
+sentinel-sdk-test/
+dev_only/
